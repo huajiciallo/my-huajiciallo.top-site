@@ -1,0 +1,8 @@
+# Cloudflare Pages / Netlify 通用响应头配置
+# 说明：带内容哈希的构建产物可以长缓存；图片按天缓存，避免换图后长期不更新。
+
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/images/*
+  Cache-Control: public, max-age=604800

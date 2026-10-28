@@ -1,0 +1,150 @@
+{
+  "sidebarTitle": "内刊总览",
+  "banner": {
+    "eyebrow": "SC-TENT · 03",
+    "title": "内刊总览",
+    "subtitle": "图集 / 在线工具 / 资源",
+    "background": "/images/banner-news.webp"
+  },
+  "items": [
+    {
+      "slug": "industry",
+      "shortTitle": "图集",
+      "title": "图集",
+      "subtitle": "影像、图解与现场记录",
+      "articles": [
+        {
+          "date": "2026-10-29",
+          "viewCount": 0,
+          "tag": "图集",
+          "title": "碧蓝档案 · 亚瑠｜黄昏田野",
+          "summary": "横向构图 · 三层纵深 · 黄昏暖调 · 2K。附图是该提示词的出图结果与逐条核对。",
+          "image": "/images/bg/left/l-01.webp",
+          "id": "gallery-aru-01",
+          "pinned": true,
+          "layout": "gallery",
+          "prompt": "Blue Archive; Aru，horizontal composition, cinematic three-layer spatial depth, large depth of field with sharp focus on the character in the foreground. Foreground: the girl is large in the frame, directly facing the camera with eye contact, on the left side of the foreground, looking directly at the viewer,one hand making a cat-ear gesture above her head, the other hand relaxed, playful smile, wearing a summer office-lady outfit,. Soft warm sunset light illuminates her face, creating delicate light-and-shadow effects and a cinematic atmosphere. Midground: a continuous dirt road extending from the bottom of the frame toward the distance, connecting to the field scenery. Background: a blurred modern city skyline with bokeh, the road continues into the distance. High-detail anime art style, oil-painting texture, soft warm color palette, cinematic lighting, 2K resolution",
+          "negative": "low quality, blurry, deformed, text, signature, watermark, multiple limbs, extra fingers, ugly,lowres,bad anatomy,bad hands,text,error,missing fingers,extra digit,fewer digits,cropped,worst quality,low quality,normal quality,jpeg artifacts, signature,watermark, username,blurry,bad feet,deformed,text,signature,multiple limbs,extra fingers,ugly,censored,jpeg artifacts,patreon logo,patreon username,web address,signature,logo,artist name,safe neg,(extra fingers:2.0),extra fingers，extra toes，(extra toes:2.0)，lamp，eyes_visible_through_hair，close-up, face shot, headshot, bust shot, cropped, out of frame, top cut off, side cut off, arm cut off, head cut off, zoomed in, extremely tight framing",
+          "notes": [
+            "1. 原文：Blue Archive; Aru\n翻译：碧蓝档案；陆八魔亚瑠（阿露）\n说明：生效。画中角色是碧蓝档案的陆八魔亚瑠，粉色长发、单侧牛角配饰、红色光环这些角色特征都正确，画风也贴合碧蓝档案的美术风格。",
+            "2. 原文：horizontal composition\n翻译：横向构图\n说明：生效。画面是宽幅横向比例，属于横版构图。",
+            "3. 原文：cinematic three-layer spatial depth, large depth of field with sharp focus on the character in the foreground.\n翻译：电影感三层空间纵深，大景深，焦点清晰落在前景人物身上\n说明：部分生效。前景人物、中景田野土路、背景城市，三层空间层次和纵深感做出来了，人物对焦清晰；但背景城市是虚化的浅景深效果，没有实现大景深。",
+            "4. 原文：Foreground: the girl is large in the frame, directly facing the camera with eye contact, on the left side of the foreground, looking directly at the viewer\n翻译：前景：少女在画面中占比较大，正对镜头，和观者对视，处在前景左侧，直视观看者\n说明：部分生效。人物在画面左侧、占比大、视线朝向观看者；但人物不是完全正对镜头，是偏侧的角度，没有严格正对相机。",
+            "5. 原文：one hand making a cat-ear gesture above her head, the other hand relaxed, playful smile\n翻译：一只手在头顶比猫耳手势，另一只手自然放松，俏皮的笑容\n说明：部分生效。人物是开朗俏皮的笑容，情绪符合描述；两只手都没有做猫耳手势，一只手臂伸出画面外，另一只在脸旁张开手掌，手部姿态不满足要求。",
+            "6. 原文：wearing a summer office-lady outfit.\n翻译：穿着夏季 OL 通勤套装\n说明：部分生效。角色是翻领衬衫配领绳，有制服通勤感；只露出上半身，缺少夏季 OL 套装的完整特征，和典型夏季职场套装匹配度不高。",
+            "7. 原文：Soft warm sunset light illuminates her face, creating delicate light-and-shadow effects and a cinematic atmosphere.\n翻译：柔和温暖的日落光线打亮她的面部，营造细腻光影与电影氛围\n说明：生效。整体是黄昏暖调光线，面部光影过渡柔和，黄昏氛围感和电影感充足。",
+            "8. 原文：Midground: a continuous dirt road extending from the bottom of the frame toward the distance, connecting to the field scenery.\n翻译：中景：一条连贯土路从画面底部向远方延伸，衔接田野景色\n说明：生效。土路从画面底部一直伸向远处，道路两侧是连片田野，结构和场景完全匹配。",
+            "9. 原文：Background: a blurred modern city skyline with bokeh, the road continues into the distance.\n翻译：背景：虚化的现代城市天际线，带有散景效果，道路一直延伸向远方城市\n说明：生效。远处城市建筑是朦胧虚化的散景效果，土路向着城市方向纵深延伸。",
+            "10. 原文：High-detail anime art style, oil-painting texture, soft warm color palette, cinematic lighting, 2K resolution\n翻译：高细节动漫画风，油画肌理质感，柔和暖色调，电影打光，2K 分辨率\n说明：部分生效。精细二次元画风、暖色调、电影感打光、高清画质都满足；画面是常规二次元数字渲染，不存在油画笔触和肌理质感。"
+          ],
+          "negativeNotes": [
+            "1. 原文：low quality, blurry, lowres, worst quality, jpeg artifacts\n翻译：低画质、模糊、低分辨率、最差画质、jpg 压缩伪影\n说明：生效。画面清晰干净，没有模糊、低清、压缩噪点这类画质缺陷。",
+            "2. 原文：deformed, bad anatomy, bad hands, multiple limbs, extra fingers, extra toes, missing fingers, fewer digits\n翻译：畸形、人体结构崩坏、手部崩坏、多出肢体、多指、多趾、缺指、手指数量异常\n说明：生效。人物人体结构正常，可见的手部形态正常，没有肢体、手指畸形崩坏问题。",
+            "3. 原文：text, signature, watermark, logo, artist name, web address, username, patreon logo\n翻译：文字、签名、水印、标识、作者名字、网址、用户名、平台 logo\n说明：生效。整张画面没有任何文字、水印、签名、标识类元素。",
+            "4. 原文：close-up, headshot, bust shot, cropped, out of frame, arm cut off, head cut off, zoomed in, extremely tight framing\n翻译：特写、大头照、胸像、裁切、物体跑出画面、手臂被截断、头部被截断、放大特写、极紧凑构图\n说明：部分生效。不属于脸部大头特写、胸像和过度紧凑的放大构图；画面左侧手臂伸出画面被截断，画面下方裁切了人物身体，触发了禁止裁切的限制。",
+            "5. 原文：ugly, censored, lamp, eyes_visible_through_hair\n翻译：丑陋、打码遮挡、灯具、头发穿模露出眼睛\n说明：生效。人物形象正常，没有遮挡打码，没有多余灯具，不存在头发穿模漏眼的问题。"
+          ],
+          "images": [
+            {
+              "url": "/images/bg/left/l-01.webp",
+              "caption": ""
+            }
+          ],
+          "content": []
+        },
+        {
+          "date": "2026-06-05",
+          "viewCount": 2350,
+          "featured": false,
+          "tag": "新品发布",
+          "title": "新一代一体成型功率电感系列正式上市",
+          "summary": "采用金属合金粉末一体成型工艺的新一代功率电感系列正式上市，饱和电流提升40%，DCR降低30%，助力服务器电源小型化设计。",
+          "image": "/images/yaliu-01.jpg",
+          "id": "article-006",
+          "images": [
+            {
+              "url": "/images/yaliu-01.jpg",
+              "caption": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "company",
+      "shortTitle": "在线工具",
+      "title": "在线工具",
+      "subtitle": "随手可用的查询与计算工具",
+      "articles": [
+        {
+          "date": "2026-10-28",
+          "viewCount": 0,
+          "tag": "小工具",
+          "title": "随机角色生成器",
+          "summary": "二次元 / 异世界角色设计词库：词库 1071 条、灵格 115 条，一键生成姓名、种族、职业、外观与装备，可批量生成 10 个。",
+          "image": "/images/tool-random-character.webp",
+          "id": "tool-random-character",
+          "href": "/tools/random-character.html",
+          "pinned": true,
+          "images": [],
+          "content": []
+        },
+        {
+          "date": "2026-06-10",
+          "viewCount": 1980,
+          "tag": "企业荣誉",
+          "title": "SC-TENTTTT荣获省级专精特新企业认定",
+          "summary": "经省工信厅评审，SC-TENT正式获评省级专精特新中小企业，标志着我司在电子元器件细分领域的专业实力获得权威认可。",
+          "image": "/images/yaliu-06.jpg",
+          "id": "article-011",
+          "images": [
+            {
+              "url": "/images/yaliu-06.jpg",
+              "caption": ""
+            }
+          ],
+          "content": [
+            "近年来，国家持续加大对中小企业的支持力度，专精特新企业作为产业链供应链的关键节点，日益受到各级政府和市场的高度重视。SC-TENT 深耕电子元器件领域多年，始终以技术研发为核心驱动力。",
+            "",
+            "## 一、认定背景",
+            "本次省级专精特新中小企业认定由省工业和信息化厅组织专家团队开展严格评审，围绕企业的专业化、精细化、特色化、新颖化四个核心维度进行综合评估。",
+            "[图1]",
+            "省级专精特新中小企业认定证书（SC-TENT 实拍）",
+            "## 二、核心优势",
+            "SC-TENT 在本次评审中获得专家高度认可，主要源于以下四个方面的核心优势：",
+            "• 专业化的产品布局：聚焦共模电感、环形电感、贴片元器件等细分赛道，深耕电子元器件领域",
+            "• 精细化的质量管理：通过 IATF 16949 / ISO 9001 / ISO 14001 等多项国际体系认证",
+            "• 特色化的技术路线：自主研发金属粉末一体成型工艺，多项核心技术获得国家专利",
+            "• 新颖化的研发投入：年研发投入占营收比重持续保持在 8% 以上，组建了 30+ 人的研发团队",
+            "## 三、未来规划",
+            "此次获评省级专精特新企业，是对 SC-TENT 多年深耕细作的肯定，更是企业迈向更高发展阶段的新起点。公司将持续加大研发投入，深耕电子元器件细分领域，为客户和行业创造更大价值，向着国家级专精特新『小巨人』企业的目标稳步迈进。"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "red-theme",
+      "shortTitle": "资源",
+      "title": "资源",
+      "subtitle": "资料、标准与可下载文档",
+      "articles": [
+        {
+          "date": "2026-06-28",
+          "viewCount": 1650,
+          "tag": "党建活动",
+          "title": "SC-TENT党支部开展「重温入党誓词」主题党日活动",
+          "summary": "七一前夕，公司党支部组织全体党员赴红色教育基地参观学习，重温入党誓词，坚定理想信念。",
+          "image": "/images/yaliu-03.jpg",
+          "id": "article-014",
+          "pinned": true,
+          "images": [
+            {
+              "url": "/images/yaliu-03.jpg",
+              "caption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

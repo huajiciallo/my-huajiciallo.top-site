@@ -1,0 +1,1663 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>随机角色生成器 · 二次元 / 异世界</title>
+<style>
+  :root{
+    --bg:#0b0d12; --panel:#12151d; --line:#222836; --text:#e9e7e2; --muted:#8b93a5;
+    --gold:#c9a75a; --blue:#7f9cc9; --accent:#c8a86a;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1100px 560px at 18% -12%, #1b2033 0%, rgba(27,32,51,0) 62%),
+      radial-gradient(900px 520px at 102% -4%, #251c2f 0%, rgba(37,28,47,0) 58%),
+      var(--bg);
+    color:var(--text);
+    font:14px/1.6 "Noto Sans SC","Microsoft YaHei",system-ui,-apple-system,"Segoe UI",sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .app{max-width:1120px;margin:0 auto;padding:34px 22px 0}
+  .head{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;justify-content:space-between}
+  .brand h1{font-size:22px;margin:0;letter-spacing:.14em;font-weight:600}
+  .brand p{margin:6px 0 0;color:var(--muted);font-size:12.5px;letter-spacing:.04em}
+  .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+  .field{display:flex;flex-direction:column;gap:5px}
+  .field span{font-size:11px;color:#6f7789;letter-spacing:.1em}
+  select,input{
+    background:#141824;color:var(--text);border:1px solid var(--line);border-radius:8px;
+    padding:8px 10px;font-size:13px;font-family:inherit;outline:none;min-width:104px;
+  }
+  select:focus,input:focus{border-color:#3c4a68;box-shadow:0 0 0 3px rgba(80,110,170,.15)}
+  .field.seed input{width:132px}
+  .btn{
+    background:#1a1f2b;color:var(--text);border:1px solid var(--line);border-radius:8px;
+    padding:9px 15px;font-size:13px;font-family:inherit;cursor:pointer;transition:.16s;
+  }
+  .btn:hover{background:#202634;border-color:#39435a}
+  .btn:active{transform:translateY(1px)}
+  .btn.primary{
+    background:linear-gradient(180deg,#dcc07f,#b9974f);color:#191307;border-color:#dcc07f;font-weight:700;
+    letter-spacing:.06em;
+  }
+  .btn.primary:hover{filter:brightness(1.07)}
+  .btn.primary kbd{
+    font:inherit;font-size:10px;background:rgba(0,0,0,.16);border-radius:4px;padding:1px 5px;margin-left:6px;
+    font-weight:400;opacity:.7;
+  }
+  .btn.tiny{padding:4px 10px;font-size:12px;border-radius:6px}
+  .btn.ok{background:#24402f;border-color:#3d6b4e;color:#cfe9d6}
+
+  /* ---------- 角色主卡 ---------- */
+  .hero{margin-top:22px}
+  .hero-card{
+    position:relative;overflow:hidden;padding:26px 28px 22px;border-radius:16px;
+    background:linear-gradient(180deg,rgba(255,255,255,.028),rgba(255,255,255,0)),var(--panel);
+    border:1px solid var(--line);border-top:2px solid var(--accent);
+  }
+  .hero-mark{
+    position:absolute;right:-60px;top:-90px;width:300px;height:300px;border-radius:50%;
+    background:radial-gradient(circle,var(--accent) 0%,rgba(0,0,0,0) 68%);
+    opacity:.22;filter:blur(6px);pointer-events:none;
+  }
+  .hero-title{font-size:30px;font-weight:700;letter-spacing:.05em;line-height:1.25}
+  .hero-title .dot{color:var(--accent);margin:0 7px;font-weight:400}
+  .hero-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .mtag{
+    font-size:12px;color:#c7cddb;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.07);
+    padding:3px 10px;border-radius:999px;letter-spacing:.03em;
+  }
+  .bio{margin-top:16px;max-width:760px;position:relative}
+  .bio p{margin:5px 0;color:#b6bdcc;font-size:13.5px;line-height:1.85}
+
+  /* ---------- 分区 ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px;margin-top:14px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .panel>header{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:11px 16px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.018);
+  }
+  .panel h2{margin:0;font-size:11.5px;letter-spacing:.18em;color:#8d96a9;font-weight:600}
+  .lock{
+    background:none;border:1px solid transparent;border-radius:6px;color:#6d768a;
+    font-size:13px;line-height:1;padding:4px 7px;cursor:pointer;transition:.15s;filter:grayscale(1);
+  }
+  .lock:hover{background:#1a1f2b;color:#aeb7c9}
+  .lock.locked{filter:none;border-color:rgba(201,167,90,.55);background:rgba(201,167,90,.12)}
+  .body{padding:6px 0 10px}
+  .row{display:grid;grid-template-columns:66px 1fr;gap:10px;padding:6px 16px;align-items:baseline;font-size:13.5px}
+  .row:hover{background:rgba(255,255,255,.022)}
+  .k{color:#697287;font-size:11.5px;letter-spacing:.1em}
+  .v{color:#dfe3ea;min-width:0;overflow-wrap:anywhere}
+  .sub{color:#6a7386;font-size:11.5px;margin-left:8px;font-weight:400}
+  .none{color:#454d5f}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{
+    background:#191e2a;border:1px solid #262e3f;border-radius:999px;padding:2px 10px;font-size:12px;color:#ccd3df;
+  }
+  .sep{height:1px;background:var(--line);margin:8px 16px}
+  .notes{padding:2px 16px 8px}
+  .note{display:flex;gap:8px;font-size:11.8px;color:#7f8899;line-height:1.7}
+  .note b{color:#a2abc0;font-weight:600;min-width:38px;flex:none}
+  .sw{
+    display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:8px;vertical-align:-1px;
+    box-shadow:0 0 0 1px rgba(255,255,255,.28) inset;
+  }
+  .grade{color:var(--gold);font-weight:700;letter-spacing:.06em}
+  .holy{color:#d9c48d;font-weight:600;letter-spacing:.02em}
+
+  /* ---------- 提示词 ---------- */
+  .prompt{margin-top:14px}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;padding:14px 16px}
+  .tag{
+    font-family:ui-monospace,Consolas,"Cascadia Mono",monospace;font-size:11.8px;color:#b7c3d8;
+    background:#151a25;border:1px solid #222a3a;border-radius:5px;padding:3px 8px;
+  }
+  .actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:16px 0 0}
+  .hint{color:#59617a;font-size:12px;margin-left:auto}
+
+  /* ---------- 批量 ---------- */
+  .batch{margin-top:16px}
+  .count{color:#5f6879;font-weight:400;letter-spacing:0}
+  .bitem{border-top:1px solid var(--line);padding:12px 16px}
+  .bitem:nth-child(odd){background:rgba(255,255,255,.012)}
+  .bhead{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+  .bhead b{font-size:14px;letter-spacing:.03em}
+  .bmeta{color:#7c8598;font-size:12px}
+  .bhead .btn{margin-left:auto}
+  .bline{color:#a8b1c3;font-size:12.5px;margin-top:3px}
+  .bprompt{color:#616a7e;font-size:11.3px;margin-top:3px;font-family:ui-monospace,Consolas,monospace;line-height:1.6}
+
+  .foot{color:#495166;font-size:11.8px;margin:28px 0 44px;line-height:1.8}
+  .foot code{color:#8b93a5;background:#161b26;padding:1px 5px;border-radius:4px;font-size:11px}
+  @media (max-width:640px){
+    .app{padding:22px 14px 0}
+    .hero-card{padding:20px}
+    .hero-title{font-size:23px}
+    .row{grid-template-columns:58px 1fr;padding:6px 12px}
+  }
+  /* 返回站内 */
+  .site-back{position:fixed;left:16px;bottom:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;
+    padding:8px 14px;border:1px solid #2a3142;border-radius:999px;background:rgba(11,13,18,.82);
+    color:#c3cadb;font:12px/1 "Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;letter-spacing:.08em;
+    text-decoration:none;backdrop-filter:blur(8px);transition:color .18s,border-color .18s,background .18s}
+  .site-back:hover{color:#fff;border-color:#c9a75a;background:rgba(20,24,34,.95)}
+  @media (max-width:560px){.site-back{left:10px;bottom:10px;padding:7px 12px;font-size:11px}}
+</style>
+</head>
+<body>
+<a class="site-back" href="/">← 返回内刊</a>
+<div class="app">
+  <header class="head">
+    <div class="brand">
+      <h1>随机角色生成器</h1>
+      <p>二次元 / 异世界角色设计词库 · <span id="stat">…</span></p>
+    </div>
+    <div class="toolbar">
+      <label class="field"><span>性别</span>
+        <select id="gender">
+          <option value="random">随机</option>
+          <option value="f">女</option>
+          <option value="m">男</option>
+        </select>
+      </label>
+      <label class="field"><span>种族</span>
+        <select id="race"><option value="random">随机</option></select>
+      </label>
+      <label class="field"><span>出身</span>
+        <select id="origin"><option value="random">随机</option></select>
+      </label>
+      <label class="field seed"><span>种子</span>
+        <input id="seed" placeholder="留空 = 随机" inputmode="numeric" autocomplete="off">
+      </label>
+      <button id="gen" class="btn primary">生成<kbd>空格</kbd></button>
+      <button id="batch" class="btn">批量 ×10</button>
+    </div>
+  </header>
+
+  <section class="hero" id="hero"></section>
+
+  <div class="grid">
+    <article class="panel">
+      <header><h2>身份 · 异征</h2>
+        <button class="lock" data-lock="identity" aria-pressed="false" title="锁定后重掷时保持不变">🔓</button>
+      </header>
+      <div class="body" data-body="identity"></div>
+    </article>
+    <article class="panel">
+      <header><h2>灵格 · 圣灵</h2>
+        <button class="lock" data-lock="spirit" aria-pressed="false" title="锁定后重掷时保持不变">🔓</button>
+      </header>
+      <div class="body" data-body="spirit"></div>
+    </article>
+    <article class="panel">
+      <header><h2>外观 · 发 / 瞳 / 头饰</h2>
+        <button class="lock" data-lock="appearance" aria-pressed="false" title="锁定后重掷时保持不变">🔓</button>
+      </header>
+      <div class="body" data-body="appearance"></div>
+    </article>
+    <article class="panel">
+      <header><h2>服饰 · 衣 / 鞋 / 手部</h2>
+        <button class="lock" data-lock="outfit" aria-pressed="false" title="锁定后重掷时保持不变">🔓</button>
+      </header>
+      <div class="body" data-body="outfit"></div>
+    </article>
+    <article class="panel">
+      <header><h2>装备 · 武器 / 防具</h2>
+        <button class="lock" data-lock="gear" aria-pressed="false" title="锁定后重掷时保持不变">🔓</button>
+      </header>
+      <div class="body" data-body="gear"></div>
+    </article>
+  </div>
+
+  <section class="panel prompt">
+    <header><h2>绘图提示词</h2>
+      <button id="copyPrompt" class="btn tiny">复制</button>
+    </header>
+    <div class="tags" id="tags"></div>
+  </section>
+
+  <div class="actions">
+    <button id="copyAll" class="btn">复制整张卡</button>
+    <button id="exportJson" class="btn">导出 JSON</button>
+    <button id="exportBatch" class="btn" hidden>导出批量 JSON</button>
+    <span class="hint">空格键快速重掷 · 点 🔓 锁定分组</span>
+  </div>
+
+  <section class="panel batch" id="batchPanel" hidden>
+    <header><h2>批量结果 <span class="count" id="batchCount"></span></h2>
+      <button id="closeBatch" class="btn tiny">关闭</button>
+    </header>
+    <div id="batchList"></div>
+  </section>
+
+  <footer class="foot">
+    外观数据来自角色设计词库（发色、发型、头饰、服装、手部、武器、种族特征，共 <span id="stat2"></span> 条）；
+    姓名池共 <span id="stat4"></span> 条，按七大自治区的文化分池（山海经/百鬼夜行取姓+名，赤色凛冬取名·姓，其余取名），称号同池；
+    职业、性格、瞳色为通用补充池。服装与发型按性别做了启发式过滤。<br>
+    灵格数据（圣灵、灵种、F–SS 评级、七大自治区、所属）依据《天外飞仙柳素·世界观合并设定集》整理，共 <span id="stat3"></span> 条。
+    圣灵的神话体系与出身不绑定：山海经出身也可能觉醒希腊或北欧的圣灵。
+  </footer>
+</div>
+
+<script>window.CG_DATA = {"colors":[{"name":"纯黑","group":"黑色系"},{"name":"蓝黑","group":"黑色系"},{"name":"紫黑","group":"黑色系"},{"name":"墨黑","group":"黑色系"},{"name":"冷黑","group":"黑色系"},{"name":"栗棕","group":"棕色系"},{"name":"深栗","group":"棕色系"},{"name":"浅栗","group":"棕色系"},{"name":"蜂蜜棕","group":"棕色系"},{"name":"焦糖棕","group":"棕色系"},{"name":"奶茶棕","group":"棕色系"},{"name":"桃棕","group":"棕色系"},{"name":"红棕","group":"棕色系"},{"name":"青棕","group":"棕色系"},{"name":"灰棕","group":"棕色系"},{"name":"冷棕","group":"棕色系"},{"name":"金","group":"金色系"},{"name":"浅金","group":"金色系"},{"name":"深金","group":"金色系"},{"name":"蜜金","group":"金色系"},{"name":"亚麻金","group":"金色系"},{"name":"白金","group":"金色系"},{"name":"冷金","group":"金色系"},{"name":"蜂蜜金","group":"金色系"},{"name":"赤红","group":"红色系"},{"name":"酒红","group":"红色系"},{"name":"橙红","group":"红色系"},{"name":"火红","group":"红色系"},{"name":"红棕","group":"红色系"},{"name":"莓红","group":"红色系"},{"name":"橙金","group":"橙色系"},{"name":"橙棕","group":"橙色系"},{"name":"桃橙","group":"橙色系"},{"name":"焦糖橙","group":"橙色系"},{"name":"明黄","group":"黄色系"},{"name":"柠檬黄","group":"黄色系"},{"name":"奶黄","group":"黄色系"},{"name":"草绿","group":"绿色系"},{"name":"深绿","group":"绿色系"},{"name":"青绿","group":"绿色系"},{"name":"墨绿","group":"绿色系"},{"name":"薄荷绿","group":"绿色系"},{"name":"天蓝","group":"蓝色系"},{"name":"深蓝","group":"蓝色系"},{"name":"青蓝","group":"蓝色系"},{"name":"冰蓝","group":"蓝色系"},{"name":"海蓝","group":"蓝色系"},{"name":"藏蓝","group":"蓝色系"},{"name":"紫罗兰","group":"紫色系"},{"name":"深紫","group":"紫色系"},{"name":"淡紫","group":"紫色系"},{"name":"灰紫","group":"紫色系"},{"name":"星空紫","group":"紫色系"},{"name":"黑紫","group":"紫色系"},{"name":"银灰","group":"灰色系"},{"name":"雾灰","group":"灰色系"},{"name":"灰棕","group":"灰色系"},{"name":"冷灰","group":"灰色系"},{"name":"纯白","group":"白色系"},{"name":"银白","group":"白色系"},{"name":"奶白","group":"白色系"},{"name":"樱花粉","group":"粉色系"},{"name":"桃粉","group":"粉色系"},{"name":"粉棕","group":"粉色系"},{"name":"粉紫","group":"粉色系"},{"name":"黑紫渐变","group":"渐变系"},{"name":"海蓝渐变","group":"渐变系"},{"name":"银紫渐变","group":"渐变系"},{"name":"橙金渐变","group":"渐变系"}],"hairStyles":[{"name":"齐耳短发","desc":"发尾齐耳，干净利落","cat":"短发"},{"name":"波波头（Bob）","desc":"圆润轮廓，发尾内扣","cat":"短发"},{"name":"短波波","desc":"下巴以上，蓬松圆润","cat":"短发"},{"name":"不对称短发","desc":"左右长短不一","cat":"短发"},{"name":"狼尾短发","desc":"后颈留长，层次碎剪","cat":"短发"},{"name":"鲻鱼头（Mullet）","desc":"前短后长，两侧削薄","cat":"短发"},{"name":"碎短发","desc":"发尾碎剪，轻盈","cat":"短发"},{"name":"内扣短发","desc":"发尾向内卷","cat":"短发"},{"name":"外翻短发","desc":"发尾向外翘","cat":"短发"},{"name":"蓬松短发","desc":"空气感强，发量显多","cat":"短发"},{"name":"短卷发","desc":"小卷贴合脸型","cat":"短发"},{"name":"精灵短发（Pixie）","desc":"超短贴头，耳侧削短","cat":"短发"},{"name":"齐肩直发","desc":"发尾齐肩，顺直","cat":"齐肩"},{"name":"长波波（Lob）","desc":"肩线附近，微内扣","cat":"齐肩"},{"name":"齐肩卷发","desc":"肩线处自然卷","cat":"齐肩"},{"name":"内扣中长发","desc":"发尾向内收","cat":"齐肩"},{"name":"外翻中长发","desc":"发尾向外翻","cat":"齐肩"},{"name":"层次中长发","desc":"分层剪裁，轻盈","cat":"齐肩"},{"name":"公主切","desc":"两侧齐颊切齐，后发长","cat":"齐肩"},{"name":"姬发式","desc":"齐刘海+两侧齐颊+后长直","cat":"齐肩"},{"name":"半长直发","desc":"肩至胸口，顺直","cat":"齐肩"},{"name":"半长卷发","desc":"肩至胸口，波浪卷","cat":"齐肩"},{"name":"黑长直","desc":"经典长直发，齐刘海","cat":"长发"},{"name":"长直发","desc":"胸口至腰，顺直","cat":"长发"},{"name":"超长直发","desc":"腰以下至及踝","cat":"长发"},{"name":"大波浪","desc":"大卷弧线，成熟感","cat":"长发"},{"name":"小卷长发","desc":"细密卷，蓬松","cat":"长发"},{"name":"螺旋卷","desc":"螺旋状卷曲","cat":"长发"},{"name":"羊毛卷","desc":"细碎蓬松卷","cat":"长发"},{"name":"蛋卷头","desc":"规则波浪卷","cat":"长发"},{"name":"长卷发","desc":"胸口以下自然卷","cat":"长发"},{"name":"内扣长发","desc":"发尾向内卷","cat":"长发"},{"name":"外翻长发","desc":"发尾向外翻","cat":"长发"},{"name":"层次长发","desc":"分层剪裁","cat":"长发"},{"name":"狼尾长发","desc":"后颈留长，前短后长","cat":"长发"},{"name":"渐变卷长发","desc":"发尾渐变卷曲","cat":"长发"},{"name":"高马尾","desc":"头顶高位扎起","cat":"马尾"},{"name":"低马尾","desc":"后颈低位扎起","cat":"马尾"},{"name":"侧马尾","desc":"侧边单侧扎起","cat":"马尾"},{"name":"双马尾","desc":"左右各一，高位","cat":"马尾"},{"name":"低双马尾","desc":"左右各一，低位","cat":"马尾"},{"name":"半扎马尾","desc":"上半扎起，下半披散","cat":"马尾"},{"name":"分段马尾","desc":"马尾分节扎起","cat":"马尾"},{"name":"高马尾卷发","desc":"马尾带卷","cat":"马尾"},{"name":"侧低马尾","desc":"侧边低位扎起","cat":"马尾"},{"name":"双马尾卷发","desc":"双马尾带卷","cat":"马尾"},{"name":"单麻花辫","desc":"单侧或背后一条","cat":"辫子"},{"name":"双麻花辫","desc":"左右各一条","cat":"辫子"},{"name":"鱼骨辫","desc":"细密交错编法","cat":"辫子"},{"name":"法式辫","desc":"贴头皮编入","cat":"辫子"},{"name":"荷兰辫","desc":"反手法式辫","cat":"辫子"},{"name":"拳击辫","desc":"贴头紧编，运动感","cat":"辫子"},{"name":"脏辫","desc":"细密多股编","cat":"辫子"},{"name":"侧编发","desc":"单侧编入","cat":"辫子"},{"name":"编发马尾","desc":"编后扎马尾","cat":"辫子"},{"name":"编发盘发","desc":"编后盘起","cat":"辫子"},{"name":"双辫盘发","desc":"双辫盘成发髻","cat":"辫子"},{"name":"辫子花环头","desc":"辫子绕头成环","cat":"辫子"},{"name":"高丸子头","desc":"头顶高位丸子","cat":"丸子"},{"name":"低丸子头","desc":"后颈低位丸子","cat":"丸子"},{"name":"双丸子头","desc":"左右各一丸子","cat":"丸子"},{"name":"半丸子头","desc":"上半扎丸子，下半披散","cat":"丸子"},{"name":"花苞头","desc":"蓬松圆润丸子","cat":"丸子"},{"name":"编发丸子","desc":"编发后盘成丸子","cat":"丸子"},{"name":"低盘发","desc":"后颈低位盘起","cat":"丸子"},{"name":"高盘发","desc":"头顶高位盘起","cat":"丸子"},{"name":"法式盘发","desc":"优雅贴头盘起","cat":"丸子"},{"name":"侧盘发","desc":"侧边盘起","cat":"丸子"},{"name":"新娘盘发","desc":"华丽多层盘发","cat":"丸子"},{"name":"发髻","desc":"传统日式盘髻","cat":"丸子"},{"name":"半扎发","desc":"上半扎起，下半披散","cat":"半扎"},{"name":"半扎公主头","desc":"半扎+两侧垂发","cat":"半扎"},{"name":"半扎双马尾","desc":"上半分两侧扎起","cat":"半扎"},{"name":"半扎丸子","desc":"上半扎丸子","cat":"半扎"},{"name":"公主头","desc":"两侧收拢，后发披散","cat":"半扎"},{"name":"双马尾公主头","desc":"公主头+双马尾","cat":"半扎"},{"name":"编发公主头","desc":"两侧编入后发","cat":"半扎"},{"name":"全披散","desc":"自然垂落","cat":"披散"},{"name":"侧披","desc":"全发拨向一侧","cat":"披散"},{"name":"内扣披散","desc":"发尾内扣披散","cat":"披散"},{"name":"外翻披散","desc":"发尾外翻披散","cat":"披散"},{"name":"中分披散","desc":"中分垂落","cat":"披散"},{"name":"不对称披散","desc":"左右长度不一","cat":"披散"},{"name":"空气感披散","desc":"蓬松轻盈披散","cat":"披散"},{"name":"湿发感披散","desc":"贴头湿发造型","cat":"披散"}],"bangs":[{"name":"齐刘海","desc":"平齐额前"},{"name":"空气刘海","desc":"稀疏轻薄"},{"name":"斜刘海","desc":"斜向一侧"},{"name":"中分刘海","desc":"中间分开"},{"name":"八字刘海","desc":"两侧外翻"},{"name":"法式刘海","desc":"自然碎薄"},{"name":"眉上刘海","desc":"短至眉上"},{"name":"碎刘海","desc":"细碎不齐"},{"name":"侧分长刘海","desc":"长斜分"},{"name":"龙须刘海","desc":"两缕细长垂鬓"},{"name":"胎毛刘海","desc":"额前细绒"},{"name":"无刘海","desc":"全露额头"}],"tips":[{"name":"发尾微翘","desc":"轻微外翘"},{"name":"发尾内扣","desc":"向内卷收"},{"name":"发尾外翻","desc":"向外翻卷"},{"name":"发尾齐平","desc":"一刀切齐"},{"name":"发尾碎剪","desc":"细碎层次"},{"name":"发尾层次","desc":"分层剪裁"},{"name":"发尾渐变卷","desc":"末端渐变卷曲"},{"name":"发尾狼尾","desc":"后颈留长碎尾"}],"hairDeco":[{"name":"双马尾配发带","desc":"发带绑双马尾"},{"name":"麻花辫配发饰","desc":"辫子系发饰"},{"name":"丸子头配簪","desc":"丸子插簪"},{"name":"公主头配皇冠","desc":"半扎配皇冠"},{"name":"编发配花环","desc":"编发绕花环"},{"name":"马尾配蝴蝶结","desc":"马尾系蝴蝶结"},{"name":"散发配发夹","desc":"散发别发夹"},{"name":"盘发配发网","desc":"盘发罩发网"},{"name":"辫子配铃铛","desc":"辫尾系铃铛"},{"name":"狐耳造型","desc":"狐耳发饰"},{"name":"猫耳造型","desc":"猫耳发饰"},{"name":"龙角造型","desc":"龙角发饰"},{"name":"羽翼造型","desc":"羽翼发饰"},{"name":"光环造型","desc":"头顶光环"}],"headwear":[{"name":"发夹","desc":"单枚夹住侧发","cat":"发饰"},{"name":"一字夹","desc":"细长直线发夹","cat":"发饰"},{"name":"交叉发夹","desc":"两枚交叉成X","cat":"发饰"},{"name":"水滴发夹","desc":"水滴造型","cat":"发饰"},{"name":"星星发夹","desc":"星星造型","cat":"发饰"},{"name":"花朵发夹","desc":"花朵造型","cat":"发饰"},{"name":"蝴蝶发夹","desc":"蝴蝶造型","cat":"发饰"},{"name":"珍珠发夹","desc":"珍珠点缀","cat":"发饰"},{"name":"一字排夹","desc":"多枚并排","cat":"发饰"},{"name":"刘海夹","desc":"夹住刘海","cat":"发饰"},{"name":"侧边发卡","desc":"侧边固定","cat":"发饰"},{"name":"发扣","desc":"扣住一缕发","cat":"发饰"},{"name":"发针","desc":"细长插入固定","cat":"发饰"},{"name":"簪子","desc":"传统长簪","cat":"发饰"},{"name":"玉簪","desc":"玉石簪头","cat":"发饰"},{"name":"步摇","desc":"垂坠摇动簪","cat":"发饰"},{"name":"发梳","desc":"插入发中装饰梳","cat":"发饰"},{"name":"发插","desc":"装饰性插饰","cat":"发饰"},{"name":"发带","desc":"宽布带绕头","cat":"发带"},{"name":"细发带","desc":"细绳式发带","cat":"发带"},{"name":"丝带发带","desc":"缎面丝带","cat":"发带"},{"name":"蕾丝发带","desc":"蕾丝花边","cat":"发带"},{"name":"针织发带","desc":"毛线材质","cat":"发带"},{"name":"运动发带","desc":"吸汗运动款","cat":"发带"},{"name":"发绳","desc":"简单扎发绳","cat":"发带"},{"name":"电话线发圈","desc":"螺旋发圈","cat":"发带"},{"name":"布艺发圈","desc":"布料包覆","cat":"发带"},{"name":"珠串发绳","desc":"串珠装饰","cat":"发带"},{"name":"丝带绑发","desc":"长丝带系绑","cat":"发带"},{"name":"缎带蝴蝶结","desc":"缎带打成蝴蝶结","cat":"发带"},{"name":"双层蝴蝶结","desc":"两层叠加","cat":"发带"},{"name":"大蝴蝶结","desc":"夸张尺寸","cat":"发带"},{"name":"小蝴蝶结","desc":"精致小巧","cat":"发带"},{"name":"格纹蝴蝶结","desc":"格纹布料","cat":"发带"},{"name":"蕾丝蝴蝶结","desc":"蕾丝材质","cat":"发带"},{"name":"皮质蝴蝶结","desc":"皮革质感","cat":"发带"},{"name":"发箍","desc":"基础U形箍","cat":"发箍"},{"name":"细发箍","desc":"细金属/塑料","cat":"发箍"},{"name":"宽发箍","desc":"宽布面","cat":"发箍"},{"name":"珍珠发箍","desc":"珍珠排布","cat":"发箍"},{"name":"水钻发箍","desc":"水钻镶嵌","cat":"发箍"},{"name":"蕾丝发箍","desc":"蕾丝包覆","cat":"发箍"},{"name":"缎带发箍","desc":"缎带缠绕","cat":"发箍"},{"name":"花朵发箍","desc":"花朵装饰","cat":"发箍"},{"name":"蝴蝶结发箍","desc":"侧边蝴蝶结","cat":"发箍"},{"name":"兔耳发箍","desc":"兔耳造型","cat":"发箍"},{"name":"猫耳发箍","desc":"猫耳造型","cat":"发箍"},{"name":"狐耳发箍","desc":"狐耳造型","cat":"发箍"},{"name":"角饰发箍","desc":"恶魔角/龙角","cat":"发箍"},{"name":"光环发箍","desc":"头顶光环","cat":"发箍"},{"name":"齿梳发箍","desc":"带齿防滑","cat":"发箍"},{"name":"交叉发箍","desc":"X形交叉","cat":"发箍"},{"name":"贝雷帽","desc":"圆扁软帽","cat":"帽子"},{"name":"报童帽","desc":"八角帽","cat":"帽子"},{"name":"鸭舌帽","desc":"前檐帽","cat":"帽子"},{"name":"棒球帽","desc":"运动帽","cat":"帽子"},{"name":"针织帽","desc":"毛线帽","cat":"帽子"},{"name":"贝雷帽（画家款）","desc":"大号软帽","cat":"帽子"},{"name":"礼帽","desc":"高顶礼帽","cat":"帽子"},{"name":"小礼帽","desc":"迷你礼帽","cat":"帽子"},{"name":"爵士帽","desc":"宽檐软呢帽","cat":"帽子"},{"name":"草帽","desc":"编织草帽","cat":"帽子"},{"name":"宽檐草帽","desc":"大檐遮阳","cat":"帽子"},{"name":"渔夫帽","desc":"软檐桶帽","cat":"帽子"},{"name":"水手帽","desc":"水手服配套","cat":"帽子"},{"name":"学生帽","desc":"制服配套","cat":"帽子"},{"name":"军帽","desc":"军装配套","cat":"帽子"},{"name":"船长帽","desc":"航海风","cat":"帽子"},{"name":"女巫帽","desc":"尖顶宽檐","cat":"帽子"},{"name":"魔法帽","desc":"学院法师帽","cat":"帽子"},{"name":"学士帽","desc":"毕业方帽","cat":"帽子"},{"name":"护士帽","desc":"医疗风","cat":"帽子"},{"name":"女仆帽","desc":"蕾丝小帽","cat":"帽子"},{"name":"修女头巾","desc":"宗教头巾","cat":"帽子"},{"name":"头纱","desc":"薄纱覆头","cat":"帽子"},{"name":"面纱","desc":"遮面薄纱","cat":"帽子"},{"name":"兜帽","desc":"连衣兜帽","cat":"帽子"},{"name":"斗篷帽","desc":"斗篷连帽","cat":"帽子"},{"name":"毛绒耳罩帽","desc":"冬季护耳","cat":"帽子"},{"name":"圣诞帽","desc":"节日红帽","cat":"帽子"},{"name":"派对帽","desc":"锥形彩帽","cat":"帽子"},{"name":"皇冠帽","desc":"帽形皇冠","cat":"帽子"},{"name":"皇冠","desc":"正式王冠","cat":"皇冠"},{"name":"小皇冠","desc":"迷你王冠","cat":"皇冠"},{"name":"头冠","desc":"半环头冠","cat":"皇冠"},{"name":"花冠","desc":"花朵编成","cat":"皇冠"},{"name":"花环","desc":"环形花饰","cat":"皇冠"},{"name":"藤蔓冠","desc":"藤蔓编成","cat":"皇冠"},{"name":"水晶冠","desc":"水晶镶嵌","cat":"皇冠"},{"name":"珍珠冠","desc":"珍珠排布","cat":"皇冠"},{"name":"宝石额饰","desc":"额前宝石链","cat":"皇冠"},{"name":"额链","desc":"垂坠额链","cat":"皇冠"},{"name":"眉心坠","desc":"眉心宝石坠","cat":"皇冠"},{"name":"头链","desc":"绕头发链","cat":"皇冠"},{"name":"发际链","desc":"沿发际线","cat":"皇冠"},{"name":"月桂冠","desc":"月桂叶冠","cat":"皇冠"},{"name":"星冠","desc":"星星造型冠","cat":"皇冠"},{"name":"光环","desc":"天使光环","cat":"皇冠"},{"name":"角饰","desc":"恶魔角/龙角","cat":"皇冠"},{"name":"兽耳头饰","desc":"兽耳造型","cat":"皇冠"},{"name":"发簪","desc":"单股长簪","cat":"簪"},{"name":"发钗","desc":"双股钗","cat":"簪"},{"name":"流苏簪","desc":"流苏垂坠","cat":"簪"},{"name":"珠花簪","desc":"珠花造型","cat":"簪"},{"name":"金簪","desc":"金属簪","cat":"簪"},{"name":"银簪","desc":"银质簪","cat":"簪"},{"name":"木簪","desc":"木质简约","cat":"簪"},{"name":"花簪","desc":"花朵造型","cat":"簪"},{"name":"蝴蝶簪","desc":"蝴蝶造型","cat":"簪"},{"name":"凤凰簪","desc":"凤凰造型","cat":"簪"},{"name":"梳篦","desc":"细齿梳","cat":"簪"},{"name":"发冠","desc":"小型冠饰","cat":"簪"},{"name":"发带流苏","desc":"带垂坠发带","cat":"簪"},{"name":"额帕","desc":"额前布饰","cat":"簪"},{"name":"抹额","desc":"传统额带","cat":"簪"},{"name":"耳环","desc":"基础耳饰","cat":"耳部"},{"name":"耳钉","desc":"贴耳小钉","cat":"耳部"},{"name":"耳坠","desc":"垂坠耳饰","cat":"耳部"},{"name":"耳线","desc":"长线耳饰","cat":"耳部"},{"name":"耳夹","desc":"无耳洞夹","cat":"耳部"},{"name":"耳骨夹","desc":"夹耳骨","cat":"耳部"},{"name":"耳罩","desc":"保暖耳罩","cat":"耳部"},{"name":"耳机","desc":"头戴耳机","cat":"耳部"},{"name":"猫耳耳机","desc":"猫耳造型","cat":"耳部"},{"name":"蓝牙耳机","desc":"单耳耳机","cat":"耳部"},{"name":"耳麦","desc":"带麦克风","cat":"耳部"},{"name":"侧头花","desc":"侧边大花","cat":"耳部"},{"name":"侧头羽饰","desc":"羽毛侧饰","cat":"耳部"},{"name":"侧头蝴蝶结","desc":"侧边大蝴蝶结","cat":"耳部"},{"name":"眼镜","desc":"普通镜框","cat":"面罩"},{"name":"圆框眼镜","desc":"圆形镜框","cat":"面罩"},{"name":"方框眼镜","desc":"方形镜框","cat":"面罩"},{"name":"半框眼镜","desc":"半框设计","cat":"面罩"},{"name":"单片眼镜","desc":"单眼佩戴","cat":"面罩"},{"name":"墨镜","desc":"遮阳镜","cat":"面罩"},{"name":"护目镜","desc":"工装/飞行","cat":"面罩"},{"name":"面具","desc":"全脸面具","cat":"面罩"},{"name":"半脸面具","desc":"遮半脸","cat":"面罩"},{"name":"眼罩","desc":"单眼遮罩","cat":"面罩"},{"name":"绷带眼罩","desc":"绷带缠绕","cat":"面罩"},{"name":"口罩","desc":"医用口罩","cat":"面罩"},{"name":"布口罩","desc":"布艺口罩","cat":"面罩"},{"name":"狐狸面具","desc":"日式狐面","cat":"面罩"},{"name":"猫面具","desc":"猫脸面具","cat":"面罩"},{"name":"眼罩发带","desc":"发带兼眼罩","cat":"面罩"},{"name":"恶魔角","desc":"弯角造型","cat":"特殊"},{"name":"龙角","desc":"龙族角饰","cat":"特殊"},{"name":"兽耳","desc":"猫/狐/狼/兔耳","cat":"特殊"},{"name":"羽翼头饰","desc":"小翼造型","cat":"特殊"},{"name":"精灵耳饰","desc":"尖耳装饰","cat":"特殊"},{"name":"星形发饰","desc":"星星造型","cat":"特殊"},{"name":"月亮发饰","desc":"月牙造型","cat":"特殊"},{"name":"太阳发饰","desc":"太阳造型","cat":"特殊"},{"name":"齿轮发饰","desc":"蒸汽朋克","cat":"特殊"},{"name":"钥匙发饰","desc":"钥匙造型","cat":"特殊"},{"name":"铃铛发饰","desc":"铃铛点缀","cat":"特殊"},{"name":"羽毛头饰","desc":"羽毛插入","cat":"特殊"},{"name":"宝石发饰","desc":"大颗宝石","cat":"特殊"},{"name":"水晶发饰","desc":"水晶簇","cat":"特殊"},{"name":"贝壳发饰","desc":"海洋风","cat":"特殊"},{"name":"珊瑚发饰","desc":"珊瑚造型","cat":"特殊"},{"name":"藤蔓发饰","desc":"藤蔓缠绕","cat":"特殊"},{"name":"蝴蝶结发饰","desc":"大号蝴蝶结","cat":"特殊"},{"name":"丝带发饰","desc":"长丝带垂坠","cat":"特殊"},{"name":"发簪流苏","desc":"簪+流苏","cat":"特殊"},{"name":"发冠流苏","desc":"冠+垂坠","cat":"特殊"},{"name":"网纱头饰","desc":"复古网纱","cat":"特殊"},{"name":"羽毛发箍","desc":"羽毛装饰箍","cat":"特殊"}],"apparel":{"tops":[{"name":"衬衫","base":"白衬衫/牛津纺","twist":"领口缀符文刺绣、袖口镶魔晶扣"},{"name":"立领衬衫","base":"中式立领","twist":"领内藏护身咒文"},{"name":"荷叶边衬衫","base":"复古衬衫","twist":"荷叶边用发光丝线"},{"name":"泡泡袖衬衫","base":"宫廷衬衫","twist":"袖内衬轻纱如翼膜"},{"name":"露肩衬衫","base":"一字肩","twist":"肩线缀星砂"},{"name":"针织衫","base":"毛衣","twist":"毛线掺入月光纤维"},{"name":"高领毛衣","base":"turtleneck","twist":"领口织入保暖结界纹"},{"name":"开衫","base":"针织开衫","twist":"纽扣为小型封印石"},{"name":"卫衣","base":"连帽卫衣","twist":"帽内衬星图、抽绳系铃铛"},{"name":"短袖T恤","base":"基础T","twist":"印花为会动的魔法阵"},{"name":"长袖T恤","base":"打底T","twist":"袖口有元素徽记"},{"name":"POLO衫","base":"翻领短袖","twist":"领尖缀小徽章"},{"name":"吊带背心","base":"细带背心","twist":"肩带为发光丝线"},{"name":"抹胸","base":"无肩带上衣","twist":"上缘镶碎晶"},{"name":"露脐短上衣","base":"crop top","twist":"下摆缀流苏铃铛"},{"name":"束腰上衣","base":"紧身胸衣","twist":"骨架为轻质魔金"},{"name":"马甲","base":"西装马甲","twist":"背面绣家族纹章"},{"name":"背带装","base":"背带裤上装","twist":"背带扣为齿轮造型"},{"name":"水手服上衣","base":"日系水手服","twist":"领巾换成魔法学院绶带"},{"name":"西装外套上衣","base":"制服上装","twist":"肩章嵌元素晶石"},{"name":"工装衬衫","base":"牛仔工装","twist":"口袋绣工具符文"},{"name":"飞行员夹克内搭","base":"飞行服上装","twist":"胸口有气压魔导表"},{"name":"机能风上衣","base":"techwear","twist":"拉链为魔导轨道"},{"name":"旗袍上衣","base":"改良旗袍","twist":"盘扣为小封印扣"},{"name":"和风上衣","base":"羽织内搭","twist":"衣襟绣家纹"},{"name":"哥特上衣","base":"蕾丝衬衫","twist":"蕾丝织入暗影丝"},{"name":"学院制服上衣","base":"西装校服","twist":"领口别学院徽章"},{"name":"护士服上衣","base":"医疗制服","twist":"口袋插魔药瓶"},{"name":"女仆装上衣","base":"蕾丝围裙装","twist":"围裙边绣召唤阵"},{"name":"运动背心","base":"健身背心","twist":"面料含风元素纤维"}],"bottoms":[{"name":"百褶短裙","base":"学院裙","twist":"褶间夹发光细线"},{"name":"A字裙","base":"基础半裙","twist":"裙摆绣浮空纹"},{"name":"包臀裙","base":"通勤裙","twist":"侧缝藏暗袋"},{"name":"伞裙","base":"复古大摆","twist":"裙撑为轻质魔金"},{"name":"蛋糕裙","base":"多层裙","twist":"每层颜色渐变如魔法"},{"name":"纱裙","base":"薄纱裙","twist":"纱中织入星尘"},{"name":"牛仔短裤","base":"热裤","twist":"铆钉为小晶石"},{"name":"工装短裤","base":"多口袋短裤","twist":"口袋绣工具符文"},{"name":"西装长裤","base":"直筒裤","twist":"裤线为发光细条"},{"name":"阔腿裤","base":"宽腿裤","twist":"裤脚绣风纹"},{"name":"紧身裤","base":"打底裤","twist":"面料含暗影丝"},{"name":"运动裤","base":"束脚裤","twist":"侧条为元素色带"},{"name":"背带短裤","base":"背带裤","twist":"背带扣为齿轮"},{"name":"灯笼裤","base":"哈伦裤","twist":"裤脚束口缀铃铛"},{"name":"马裤","base":"骑马裤","twist":"膝侧加护甲片"},{"name":"百褶长裙","base":"长款学院裙","twist":"裙摆绣学院纹"},{"name":"不规则半裙","base":"不对称裙","twist":"长短边缀流苏"},{"name":"皮短裤","base":"皮革短裤","twist":"铆钉为兽牙造型"},{"name":"热裤配绑腿","base":"短裤+绑腿","twist":"绑腿绣加速符文"},{"name":"和风袴","base":"日式袴裤","twist":"腰纽为家纹扣"}],"onepiece":[{"name":"衬衫连衣裙","base":"衬衫裙","twist":"腰带扣为魔晶"},{"name":"吊带连衣裙","base":"细带裙","twist":"肩带缀星砂"},{"name":"露肩连衣裙","base":"一字肩裙","twist":"肩线绣羽纹"},{"name":"公主裙","base":"蓬蓬裙","twist":"裙撑内藏浮空阵"},{"name":"洛丽塔裙","base":"Lolita","twist":"蕾丝织入暗影丝"},{"name":"哥特连衣裙","base":"哥特裙","twist":"裙摆绣蝙蝠纹"},{"name":"女仆连衣裙","base":"女仆装","twist":"围裙绣召唤阵"},{"name":"护士连衣裙","base":"护士服","twist":"口袋插魔药瓶"},{"name":"水手连衣裙","base":"水手服裙","twist":"领巾换学院绶带"},{"name":"学院制服连衣裙","base":"校服裙","twist":"领口别学院徽章"},{"name":"旗袍连衣裙","base":"改良旗袍","twist":"盘扣为封印扣"},{"name":"和服","base":"日式和服","twist":"腰带为家纹带"},{"name":"浴衣","base":"夏日浴衣","twist":"袖口绣金鱼纹"},{"name":"巫女服","base":"神社巫女装","twist":"袴纽为勾玉扣"},{"name":"修女服","base":"宗教长袍","twist":"十字架为圣光坠"},{"name":"法师长袍","base":"学院长袍","twist":"袍摆绣元素阵"},{"name":"炼金围裙装","base":"工装围裙","twist":"口袋插试剂瓶"},{"name":"背带连衣裙","base":"背带裙","twist":"背带扣为齿轮"},{"name":"连体裤","base":"工装连体","twist":"拉链为魔导轨道"},{"name":"连体短裤","base":"夏日连体","twist":"腰侧缀流苏"},{"name":"连帽连体装","base":"连体卫衣","twist":"帽子内衬星图"},{"name":"泳装（连体）","base":"连体泳衣","twist":"面料含防水咒纹"},{"name":"泳装（分体）","base":"比基尼","twist":"绑带缀贝壳铃铛"},{"name":"运动连体装","base":"体操服","twist":"侧条为元素色"},{"name":"婚纱","base":"白纱礼服","twist":"头纱织入星尘"},{"name":"礼服长裙","base":"晚礼服","twist":"裙摆绣星河纹"},{"name":"燕尾服套装","base":"正装","twist":"尾摆绣家族纹"},{"name":"军装套装","base":"军服","twist":"肩章嵌元素晶"},{"name":"骑士装","base":"铠甲内衬装","twist":"关节处加护甲片"},{"name":"冒险者套装","base":"户外装","twist":"多口袋绣工具符文"}],"outers":[{"name":"西装外套","base":"通勤西装","twist":"肩章嵌晶石"},{"name":"风衣","base":"长款风衣","twist":"腰带扣为魔晶"},{"name":"大衣","base":"羊毛大衣","twist":"内衬绣保暖阵"},{"name":"羽绒服","base":"短款羽绒","twist":"绗缝为星纹"},{"name":"夹克","base":"皮夹克","twist":"铆钉为兽牙"},{"name":"飞行员夹克","base":"飞行服","twist":"胸口有气压表"},{"name":"牛仔外套","base":"牛仔夹克","twist":"口袋绣工具符文"},{"name":"针织开衫","base":"长开衫","twist":"纽扣为封印石"},{"name":"斗篷","base":"短斗篷","twist":"内衬星图"},{"name":"披风","base":"长披风","twist":"领扣为家族纹章"},{"name":"连帽斗篷","base":"兜帽斗篷","twist":"帽檐绣隐匿纹"},{"name":"学士袍","base":"毕业袍","twist":"袖口绣学院纹"},{"name":"法师袍外套","base":"学院袍","twist":"袍摆绣元素阵"},{"name":"雨衣","base":"透明雨衣","twist":"面料含防水咒纹"},{"name":"机能风外套","base":"techwear","twist":"拉链为魔导轨道"},{"name":"军装外套","base":"军大衣","twist":"肩章嵌元素晶"},{"name":"骑士披肩","base":"护肩披风","twist":"肩甲为轻质魔金"},{"name":"毛领外套","base":"毛领大衣","twist":"毛领为幻兽绒"},{"name":"短款披肩","base":"小披肩","twist":"边缘缀流苏铃铛"},{"name":"罩衫","base":"薄纱罩衫","twist":"纱中织入星尘"}],"inners":[{"name":"文胸","base":"基础内衣","twist":"肩带为发光丝线"},{"name":"运动内衣","base":"运动款","twist":"面料含风元素纤维"},{"name":"抹胸内衣","base":"无肩带","twist":"上缘镶碎晶"},{"name":"吊带内衣","base":"细带款","twist":"肩带缀星砂"},{"name":"束腰","base":"塑身衣","twist":"骨架为轻质魔金"},{"name":"束胸","base":"紧身胸衣","twist":"背面绣家族纹"},{"name":"内裤","base":"基础款","twist":"腰边绣小符文"},{"name":"平角内裤","base":"安全裤","twist":"面料含暗影丝"},{"name":"连体内衣","base":"连体款","twist":"腰侧缀流苏"},{"name":"吊带袜","base":"吊带袜","twist":"吊扣为小晶石"},{"name":"长筒袜","base":"过膝袜","twist":"袜口绣元素纹"},{"name":"短袜","base":"踝袜","twist":"袜口缀铃铛"},{"name":"连裤袜","base":"打底袜","twist":"织入保暖咒纹"},{"name":"网袜","base":"网眼袜","twist":"网格为发光丝"},{"name":"绑腿","base":"运动绑腿","twist":"绣加速符文"},{"name":"护腕","base":"运动护腕","twist":"嵌小魔晶"},{"name":"护膝","base":"运动护膝","twist":"加轻质护甲片"},{"name":"臂套","base":"防晒臂套","twist":"绣元素徽记"},{"name":"腿环","base":"装饰腿环","twist":"缀小铃铛"},{"name":"腰封","base":"装饰腰封","twist":"扣为家族纹章"}],"appAcc":[{"name":"领带","base":"商务领带","twist":"绣家族纹章"},{"name":"领结","base":"蝴蝶结领","twist":"中心嵌小晶石"},{"name":"领巾","base":"丝巾","twist":"绣元素徽记"},{"name":"学院绶带","base":"校服绶带","twist":"绣学院纹"},{"name":"腰带","base":"皮带","twist":"扣为家族纹章"},{"name":"腰链","base":"装饰链","twist":"缀小铃铛"},{"name":"腰封","base":"宽腰封","twist":"扣为魔晶"},{"name":"臂章","base":"袖章","twist":"嵌元素晶石"},{"name":"肩章","base":"军装肩章","twist":"嵌元素晶石"},{"name":"胸针","base":"装饰胸针","twist":"为小型封印石"},{"name":"徽章","base":"学院徽章","twist":"嵌元素晶石"},{"name":"项链","base":"基础项链","twist":"坠为魔晶"},{"name":"吊坠","base":"单坠项链","twist":"为小型护身符"},{"name":"手链","base":"基础手链","twist":"缀小铃铛"},{"name":"手镯","base":"宽手镯","twist":"刻防护符文"},{"name":"戒指","base":"基础戒指","twist":"嵌小魔晶"},{"name":"耳环","base":"基础耳饰","twist":"缀星砂"},{"name":"手套","base":"皮手套","twist":"手背绣元素纹"},{"name":"半指手套","base":"运动手套","twist":"指节加护甲片"},{"name":"长手套","base":"晚宴手套","twist":"织入暗影丝"},{"name":"围巾","base":"针织围巾","twist":"织入保暖咒纹"},{"name":"披肩","base":"薄纱披肩","twist":"纱中织入星尘"},{"name":"背包","base":"双肩包","twist":"绣工具符文"},{"name":"斜挎包","base":"单肩包","twist":"扣为魔晶"},{"name":"手提包","base":"通勤包","twist":"内衬绣收纳阵"},{"name":"腰包","base":"运动腰包","twist":"绣工具符文"},{"name":"行李箱","base":"旅行箱","twist":"内衬绣收纳阵"},{"name":"雨伞","base":"折叠伞","twist":"伞面绣防水咒纹"},{"name":"怀表","base":"怀表","twist":"表盘为星象图"},{"name":"单片眼镜","base":"单片镜","twist":"镜片嵌小魔晶"},{"name":"护目镜","base":"工装镜","twist":"镜片含夜视咒纹"},{"name":"面具","base":"半脸面具","twist":"边缘绣隐匿纹"},{"name":"眼罩","base":"单眼罩","twist":"边缘绣防护纹"},{"name":"发带","base":"运动发带","twist":"绣元素徽记"},{"name":"头巾","base":"包头巾","twist":"织入保暖咒纹"},{"name":"兜帽","base":"连衣兜帽","twist":"帽檐绣隐匿纹"},{"name":"披风扣","base":"领扣","twist":"为家族纹章扣"},{"name":"束发带","base":"发绳","twist":"缀小铃铛"},{"name":"挂饰","base":"手机挂饰","twist":"为小型护身符"},{"name":"腰挂小包","base":"零钱包","twist":"绣工具符文"}],"shoes":[{"name":"短靴","base":"踝靴","twist":"鞋扣为魔晶"},{"name":"长靴","base":"过膝靴","twist":"靴筒绣元素纹"},{"name":"马丁靴","base":"厚底靴","twist":"鞋底刻防滑符文"},{"name":"工装靴","base":"劳保靴","twist":"鞋头加铁片"},{"name":"骑士靴","base":"骑马靴","twist":"膝侧加护甲片"},{"name":"雨靴","base":"防水靴","twist":"面料含防水咒纹"},{"name":"运动鞋","base":"跑步鞋","twist":"鞋侧绣风纹"},{"name":"帆布鞋","base":"休闲鞋","twist":"鞋带缀小铃铛"},{"name":"皮鞋","base":"牛津鞋","twist":"鞋扣为家族纹章"},{"name":"乐福鞋","base":"便鞋","twist":"鞋面绣小符文"},{"name":"玛丽珍鞋","base":"搭扣鞋","twist":"搭扣为小晶石"},{"name":"高跟鞋","base":"细高跟","twist":"鞋跟嵌碎晶"},{"name":"粗跟鞋","base":"通勤鞋","twist":"鞋面绣星纹"},{"name":"凉鞋","base":"绑带凉鞋","twist":"绑带缀贝壳铃铛"},{"name":"木屐","base":"日式木屐","twist":"屐带为家纹带"},{"name":"拖鞋","base":"居家拖鞋","twist":"鞋面绣小符文"},{"name":"雪地靴","base":"保暖靴","twist":"内衬为幻兽绒"},{"name":"舞鞋","base":"芭蕾鞋","twist":"鞋带为发光丝线"}],"socks":[{"name":"短袜","base":"棉袜","twist":"袜口缀铃铛"},{"name":"中筒袜","base":"学院袜","twist":"袜口绣学院纹"},{"name":"过膝袜","base":"长筒袜","twist":"袜口绣元素纹"},{"name":"堆堆袜","base":"宽松袜","twist":"袜口缀流苏"},{"name":"连裤袜","base":"打底袜","twist":"织入保暖咒纹"},{"name":"网袜","base":"网眼袜","twist":"网格为发光丝"},{"name":"足袋","base":"日式分趾袜","twist":"袜底绣防滑纹"},{"name":"绑腿","base":"运动绑腿","twist":"绣加速符文"},{"name":"腿套","base":"针织腿套","twist":"织入保暖咒纹"},{"name":"袜套","base":"堆叠袜套","twist":"袜口缀铃铛"},{"name":"吊带袜","base":"吊带袜","twist":"吊扣为小晶石"},{"name":"护腿","base":"运动护腿","twist":"加轻质护甲片"}]},"hands":{"wrist":[{"name":"手表","base":"机械表","twist":"表盘为星象图/元素刻度"},{"name":"智能手表","base":"运动表","twist":"屏幕显示魔力值/结界状态"},{"name":"怀表链腕饰","base":"怀表","twist":"链坠为小魔晶"},{"name":"手链","base":"基础手链","twist":"缀小铃铛/星砂"},{"name":"珠串手链","base":"串珠手链","twist":"珠子为封印石"},{"name":"皮革手环","base":"皮质手环","twist":"刻防护符文"},{"name":"编织手绳","base":"幸运绳","twist":"织入祝福咒纹"},{"name":"金属手镯","base":"宽手镯","twist":"刻家族纹章"},{"name":"开口手镯","base":"开口镯","twist":"两端为兽首造型"},{"name":"多层手镯","base":"叠戴镯","twist":"每层嵌不同元素晶"},{"name":"臂环","base":"上臂环","twist":"缀流苏铃铛"},{"name":"臂钏","base":"缠绕臂饰","twist":"蛇形/藤蔓造型"},{"name":"腕带","base":"运动腕带","twist":"绣元素徽记"},{"name":"护腕","base":"运动护腕","twist":"嵌小魔晶"},{"name":"皮革护腕","base":"工装护腕","twist":"加轻质护甲片"},{"name":"金属护腕","base":"骑士护腕","twist":"刻防御符文"},{"name":"绑带护腕","base":"绷带缠绕","twist":"织入治愈咒纹"},{"name":"腕甲","base":"铠甲腕甲","twist":"关节处加护片"},{"name":"腕套","base":"针织腕套","twist":"织入保暖咒纹"},{"name":"腕绳","base":"细绳腕饰","twist":"缀小铃铛"},{"name":"腕铃","base":"铃铛腕饰","twist":"铃身为封印铃"},{"name":"腕链","base":"垂坠腕链","twist":"坠为小护身符"},{"name":"腕花","base":"花朵腕饰","twist":"花为魔法花"},{"name":"腕纱","base":"薄纱腕饰","twist":"纱中织入星尘"},{"name":"腕扣","base":"装饰腕扣","twist":"扣为家族纹章"},{"name":"腕轮","base":"环形腕饰","twist":"轮面刻元素阵"},{"name":"腕环","base":"简约腕环","twist":"内刻隐匿纹"},{"name":"腕甲片","base":"单片护腕","twist":"加魔晶镶嵌"},{"name":"腕带表","base":"表带式","twist":"表盘为占卜盘"},{"name":"腕部挂饰","base":"挂链腕饰","twist":"坠为小钥匙"}],"handBack":[{"name":"手套","base":"皮手套","twist":"手背绣元素纹"},{"name":"半指手套","base":"运动手套","twist":"指节加护甲片"},{"name":"长手套","base":"晚宴手套","twist":"织入暗影丝"},{"name":"露指手套","base":"骑行手套","twist":"掌心绣防滑符文"},{"name":"针织手套","base":"毛线手套","twist":"织入保暖咒纹"},{"name":"皮手套","base":"机车手套","twist":"铆钉为兽牙造型"},{"name":"骑士手套","base":"铠甲手套","twist":"关节加护甲片"},{"name":"法师手套","base":"仪式手套","twist":"掌心绣元素阵"},{"name":"炼金手套","base":"耐热手套","twist":"掌心嵌防溅咒纹"},{"name":"园艺手套","base":"布艺手套","twist":"指尖加防刺片"},{"name":"医疗手套","base":"医用薄手套","twist":"指尖绣治愈纹"},{"name":"礼仪手套","base":"白色礼服手套","twist":"手背绣家族纹"},{"name":"战术手套","base":"战术手套","twist":"手背加护甲片"},{"name":"飞行手套","base":"飞行员手套","twist":"手腕有气压表"},{"name":"弓手护指","base":"射箭护指","twist":"刻精准符文"},{"name":"手背链","base":"手背链饰","twist":"链坠为小魔晶"},{"name":"手背贴饰","base":"纹身贴","twist":"为发光咒纹贴"},{"name":"手背护片","base":"运动护片","twist":"加轻质魔金"},{"name":"指虎","base":"格斗指虎","twist":"刻破甲符文"},{"name":"手笼","base":"毛绒手笼","twist":"内衬为幻兽绒"}],"fingers":[{"name":"戒指","base":"基础戒指","twist":"嵌小魔晶"},{"name":"素圈戒指","base":"简约圈戒","twist":"内刻隐匿纹"},{"name":"宝石戒指","base":"镶宝石","twist":"宝石为元素晶"},{"name":"印章戒指","base":"家族印章","twist":"印面为家族纹章"},{"name":"契约戒指","base":"对戒","twist":"刻契约咒文"},{"name":"封印戒指","base":"宽面戒","twist":"戒面为封印石"},{"name":"元素戒指","base":"多色戒","twist":"按元素分色"},{"name":"守护戒指","base":"护身戒","twist":"内刻防护符文"},{"name":"储物戒指","base":"素面戒","twist":"内藏收纳阵"},{"name":"通讯戒指","base":"智能戒","twist":"戒面显示讯息"},{"name":"定位戒指","base":"追踪戒","twist":"内刻追踪符文"},{"name":"戒指链","base":"项链挂戒","twist":"坠为小戒"},{"name":"多指戒","base":"连指戒","twist":"每指嵌不同晶"},{"name":"指环","base":"细指环","twist":"缀小铃铛"},{"name":"指套","base":"护指套","twist":"刻精准符文"},{"name":"指甲套","base":"护甲套","twist":"金属雕花"},{"name":"美甲贴","base":"美甲","twist":"为发光咒纹甲"},{"name":"甲片","base":"装饰甲片","twist":"嵌碎晶"},{"name":"指链","base":"指间链","twist":"链坠为小星砂"},{"name":"指虎环","base":"装饰指环","twist":"刻兽牙纹"}],"handheld":[{"name":"手提包","base":"通勤包","twist":"内衬绣收纳阵"},{"name":"手拿包","base":"晚宴包","twist":"扣为魔晶"},{"name":"手袋","base":"布艺手袋","twist":"绣工具符文"},{"name":"手提箱","base":"旅行箱","twist":"内衬绣收纳阵"},{"name":"公文包","base":"商务包","twist":"扣为家族纹章"},{"name":"书包","base":"双肩书包","twist":"绣学院纹"},{"name":"手提灯笼","base":"现代提灯","twist":"灯芯为魔晶"},{"name":"手杖","base":"装饰手杖","twist":"杖头为元素晶"},{"name":"伞","base":"折叠伞","twist":"伞面绣防水咒纹"},{"name":"折扇","base":"纸折扇","twist":"扇面绘魔法阵"},{"name":"团扇","base":"圆扇","twist":"扇柄缀流苏"},{"name":"手镜","base":"化妆镜","twist":"镜面刻占卜纹"},{"name":"手帕","base":"布手帕","twist":"绣治愈咒纹"},{"name":"手套箱","base":"收纳盒","twist":"内衬绣收纳阵"},{"name":"手持风扇","base":"小风扇","twist":"扇叶为风元素"},{"name":"手摇铃","base":"铃铛","twist":"铃身为封印铃"},{"name":"手鼓","base":"小鼓","twist":"鼓面绘召唤阵"},{"name":"手笛","base":"小笛","twist":"刻音律符文"},{"name":"手杖剑","base":"杖中剑","twist":"杖头为魔晶"},{"name":"手弩","base":"小型弩","twist":"刻精准符文"},{"name":"手持法杖","base":"短法杖","twist":"杖头为元素晶"},{"name":"手持魔导器","base":"小型装置","twist":"刻魔导轨道"},{"name":"手持药剂瓶","base":"试剂瓶","twist":"瓶身刻防溅纹"},{"name":"手持卷轴","base":"卷轴","twist":"卷面绘封印阵"},{"name":"手持书","base":"魔导书","twist":"封面嵌魔晶"},{"name":"手持铃杖","base":"仪式铃杖","twist":"铃为圣光铃"},{"name":"手持香炉","base":"香炉","twist":"炉身刻净化纹"},{"name":"手持花束","base":"花束","twist":"花为魔法花"},{"name":"手持提篮","base":"篮子","twist":"篮身绣藤蔓纹"},{"name":"手持水壶","base":"浇水壶","twist":"壶身刻水元素"}],"handFantasy":[{"name":"义手","base":"机械/魔导义手，关节可见齿轮","twist":""},{"name":"魔导义肢","base":"义手嵌魔晶，掌心有元素阵","twist":""},{"name":"金属指套","base":"全指金属护套，刻符文","twist":""},{"name":"兽爪手套","base":"指尖为兽爪造型","twist":""},{"name":"龙爪手套","base":"指尖为龙爪造型","twist":""},{"name":"羽翼手饰","base":"手背缀小翼造型","twist":""},{"name":"发光手纹","base":"手背浮现发光咒纹","twist":""},{"name":"封印手环","base":"手环刻封印阵，可展开","twist":""},{"name":"锁链手铐","base":"装饰性手铐，链坠为小铃铛","twist":""},{"name":"手部绷带","base":"绷带缠绕，织入治愈纹","twist":""},{"name":"手部护甲","base":"全手护甲，关节加护片","twist":""},{"name":"手部纱套","base":"薄纱手套，织入星尘","twist":""},{"name":"手部纹身","base":"发光咒纹纹身","twist":""},{"name":"手部挂链","base":"手背至指间挂链","twist":""},{"name":"手部铃铛","base":"多铃铛手饰","twist":""},{"name":"手部花饰","base":"手腕至手背花饰","twist":""},{"name":"手部羽毛","base":"手背缀羽毛","twist":""},{"name":"手部水晶","base":"手背嵌水晶簇","twist":""},{"name":"手部齿轮","base":"手背缀小齿轮","twist":""},{"name":"手部钥匙","base":"手背挂小钥匙","twist":""}]},"weapons":[{"name":"匕首","desc":"短小双刃，近身刺击","cats":["短兵"]},{"name":"短刀","desc":"单刃短刀","cats":["短兵","刀"]},{"name":"格斗刀","desc":"军用小刀","cats":["短兵"]},{"name":"飞刀","desc":"可投掷的短刀","cats":["短兵","投掷"]},{"name":"短剑","desc":"短于常规剑","cats":["短兵"]},{"name":"长剑","desc":"单手直剑","cats":["短兵"]},{"name":"阔剑","desc":"剑身宽厚","cats":["短兵"]},{"name":"弯刀","desc":"弧形单刃","cats":["短兵","剑"]},{"name":"军刀","desc":"骑兵用弯刀","cats":["短兵","剑"]},{"name":"马刀","desc":"骑兵长刀","cats":["短兵"]},{"name":"武士刀","desc":"日本刀，单刃弧身","cats":["短兵"]},{"name":"太刀","desc":"长于打刀","cats":["短兵","剑"]},{"name":"打刀","desc":"标准日本刀","cats":["短兵","剑"]},{"name":"胁差","desc":"日本短刀","cats":["短兵","剑"]},{"name":"短棍","desc":"单手木棍","cats":["短兵"]},{"name":"警棍","desc":"执法短棍","cats":["短兵","钝器"]},{"name":"铁尺","desc":"中式短兵器","cats":["短兵","钝器","特殊"]},{"name":"手斧","desc":"单手小斧","cats":["短兵","钝器"]},{"name":"战锤","desc":"单手锤","cats":["短兵","长兵","钝器"]},{"name":"钉头锤","desc":"带钉锤头","cats":["短兵","钝器"]},{"name":"链锤","desc":"短链连锤头","cats":["短兵","钝器"]},{"name":"拳套","desc":"金属护手","cats":["短兵","钝器"]},{"name":"指虎","desc":"指节护具","cats":["短兵","钝器","特殊"]},{"name":"手爪","desc":"爪形短兵","cats":["短兵"]},{"name":"刺剑","desc":"细长刺击剑","cats":["短兵","剑"]},{"name":"小剑","desc":"文艺复兴短剑","cats":["短兵"]},{"name":"短柄镰","desc":"短柄镰刀","cats":["短兵"]},{"name":"短矛","desc":"单手短矛","cats":["短兵"]},{"name":"投斧","desc":"可投掷短斧","cats":["短兵","钝器"]},{"name":"短鞭","desc":"短皮革鞭","cats":["短兵"]},{"name":"长枪","desc":"长杆枪头","cats":["长兵","长柄"]},{"name":"骑枪","desc":"骑兵长枪","cats":["长兵","长柄"]},{"name":"矛","desc":"长杆尖刃","cats":["长兵","长柄"]},{"name":"长矛","desc":"超长矛","cats":["长兵","长柄"]},{"name":"戟","desc":"枪头带月牙","cats":["长兵","长柄"]},{"name":"长戟","desc":"长柄戟","cats":["长兵","长柄"]},{"name":"斧枪","desc":"斧与枪结合","cats":["长兵","长柄"]},{"name":"战斧","desc":"双手大斧","cats":["长兵","钝器"]},{"name":"长柄斧","desc":"长杆斧","cats":["长兵","钝器","长柄"]},{"name":"长柄锤","desc":"长杆锤","cats":["长兵","钝器","长柄"]},{"name":"狼牙棒","desc":"带刺长棒","cats":["长兵","钝器"]},{"name":"长棍","desc":"双手木棍","cats":["长兵","钝器"]},{"name":"齐眉棍","desc":"齐眉高棍","cats":["长兵","钝器","长柄"]},{"name":"三节棍","desc":"三段连接棍","cats":["长兵","钝器","特殊"]},{"name":"双节棍","desc":"两段连接棍","cats":["长兵","钝器","特殊"]},{"name":"长刀","desc":"长柄大刀","cats":["长兵"]},{"name":"偃月刀","desc":"弧形长柄刀","cats":["长兵","长柄"]},{"name":"斩马刀","desc":"长柄斩马","cats":["长兵","长柄"]},{"name":"长柄镰","desc":"长柄镰刀","cats":["长兵","长柄"]},{"name":"草镰","desc":"农用长镰","cats":["长兵"]},{"name":"长鞭","desc":"长皮革鞭","cats":["长兵","长柄"]},{"name":"九节鞭","desc":"多节金属鞭","cats":["长兵","长柄","特殊"]},{"name":"流星锤","desc":"绳连锤头","cats":["长兵","钝器","长柄","投掷","特殊"]},{"name":"绳镖","desc":"绳连镖头","cats":["长兵","长柄","投掷","特殊"]},{"name":"长柄战镰","desc":"长柄战斗镰","cats":["长兵"]},{"name":"长柄叉","desc":"农用叉","cats":["长兵","长柄"]},{"name":"三叉戟","desc":"三尖长柄","cats":["长兵","长柄"]},{"name":"长柄钩","desc":"长柄钩刃","cats":["长兵","长柄"]},{"name":"长柄锏","desc":"中式长锏","cats":["长兵","长柄"]},{"name":"直剑","desc":"双刃直身","cats":["剑"]},{"name":"双手剑","desc":"双手握持","cats":["剑"]},{"name":"大剑","desc":"超长重剑","cats":["剑"]},{"name":"巨剑","desc":"超大剑身","cats":["剑"]},{"name":"焰形剑","desc":"波浪刃","cats":["剑"]},{"name":"德国双手剑","desc":"长柄护手","cats":["剑"]},{"name":"苏格兰阔剑","desc":"篮形护手","cats":["剑"]},{"name":"骑士剑","desc":"十字护手","cats":["剑"]},{"name":"波斯弯刀","desc":"细弧刀身","cats":["剑"]},{"name":"尼泊尔弯刀","desc":"内弧刀身","cats":["剑"]},{"name":"日本刀","desc":"单刃弧身","cats":["剑"]},{"name":"忍者刀","desc":"直刃短刀","cats":["剑"]},{"name":"中国剑","desc":"双刃直剑","cats":["剑"]},{"name":"太极剑","desc":"柔韧剑身","cats":["剑"]},{"name":"苗刀","desc":"长柄单刃","cats":["剑"]},{"name":"唐刀","desc":"直刃长刀","cats":["剑"]},{"name":"环首刀","desc":"环首直刀","cats":["剑"]},{"name":"斩马剑","desc":"长柄重剑","cats":["剑"]},{"name":"花剑","desc":"击剑用剑","cats":["剑"]},{"name":"重剑","desc":"击剑重剑","cats":["剑"]},{"name":"佩剑","desc":"击剑弯刃","cats":["剑"]},{"name":"礼仪剑","desc":"装饰用剑","cats":["剑"]},{"name":"手杖剑","desc":"杖中藏剑","cats":["剑","特殊"]},{"name":"双剑","desc":"成对短剑","cats":["剑"]},{"name":"砍刀","desc":"厚背单刃","cats":["刀"]},{"name":"开山刀","desc":"长柄砍刀","cats":["刀"]},{"name":"柴刀","desc":"农用砍刀","cats":["刀"]},{"name":"猎刀","desc":"狩猎用刀","cats":["刀"]},{"name":"生存刀","desc":"户外用刀","cats":["刀"]},{"name":"战术刀","desc":"军用直刀","cats":["刀"]},{"name":"折刀","desc":"可折叠刀","cats":["刀"]},{"name":"弹簧刀","desc":"弹开折刀","cats":["刀"]},{"name":"蝴蝶刀","desc":"甩动折刀","cats":["刀"]},{"name":"爪刀","desc":"弧形反握刀","cats":["刀"]},{"name":"库克里刀","desc":"尼泊尔弯刀","cats":["刀"]},{"name":"帕兰刀","desc":"东南亚砍刀","cats":["刀"]},{"name":"廓尔喀刀","desc":"尼泊尔军刀","cats":["刀"]},{"name":"大砍刀","desc":"长柄厚刃","cats":["刀"]},{"name":"斩骨刀","desc":"厚背重刀","cats":["刀"]},{"name":"日本菜刀","desc":"单刃厨刀","cats":["刀"]},{"name":"柳刃","desc":"细长刺身刀","cats":["刀"]},{"name":"出刃","desc":"厚背鱼刀","cats":["刀"]},{"name":"怀剑","desc":"随身短剑","cats":["刀"]},{"name":"木棍","desc":"基础钝器","cats":["钝器"]},{"name":"铁棍","desc":"金属短棍","cats":["钝器"]},{"name":"伸缩警棍","desc":"可伸缩","cats":["钝器"]},{"name":"锏","desc":"中式长锏","cats":["钝器"]},{"name":"鞭锏","desc":"复合钝器","cats":["钝器"]},{"name":"拐","desc":"中式拐棍","cats":["钝器","特殊"]},{"name":"双拐","desc":"成对拐棍","cats":["钝器","特殊"]},{"name":"铁拳套","desc":"全手护具","cats":["钝器"]},{"name":"双刃斧","desc":"两面开刃","cats":["钝器"]},{"name":"戟斧","desc":"斧戟结合","cats":["钝器"]},{"name":"锤矛","desc":"锤与矛结合","cats":["钝器"]},{"name":"晨星锤","desc":"球形带刺锤","cats":["钝器"]},{"name":"投矛","desc":"可投掷矛","cats":["长柄","投掷"]},{"name":"战镰","desc":"长柄战镰","cats":["长柄"]},{"name":"长柄刀","desc":"长柄大刀","cats":["长柄"]},{"name":"长柄棍","desc":"长杆棍","cats":["长柄"]},{"name":"长柄战斧","desc":"长杆战斧","cats":["长柄"]},{"name":"长柄战锤","desc":"长杆战锤","cats":["长柄"]},{"name":"长柄刺","desc":"长杆刺击","cats":["长柄"]},{"name":"长柄爪","desc":"长杆爪刃","cats":["长柄"]},{"name":"长柄刃","desc":"长杆刀刃","cats":["长柄"]},{"name":"飞镖","desc":"投掷镖","cats":["投掷"]},{"name":"飞斧","desc":"投掷斧","cats":["投掷"]},{"name":"飞锤","desc":"投掷锤","cats":["投掷"]},{"name":"投石索","desc":"绳索投石","cats":["投掷"]},{"name":"弹弓","desc":"皮筋弹射","cats":["投掷"]},{"name":"吹箭","desc":"吹管射箭","cats":["投掷"]},{"name":"吹镖","desc":"吹管射镖","cats":["投掷"]},{"name":"标枪","desc":"田径/军用","cats":["投掷"]},{"name":"手榴弹","desc":"投掷爆炸","cats":["投掷","火器"]},{"name":"燃烧瓶","desc":"投掷燃烧","cats":["投掷"]},{"name":"飞石","desc":"徒手投石","cats":["投掷"]},{"name":"回旋镖","desc":"可回旋投掷","cats":["投掷"]},{"name":"捕网","desc":"投掷网","cats":["投掷","特殊"]},{"name":"套索","desc":"绳圈投掷","cats":["投掷","特殊"]},{"name":"飞爪","desc":"绳连爪钩","cats":["投掷","特殊"]},{"name":"投掷匕首","desc":"平衡投掷刀","cats":["投掷"]},{"name":"长弓","desc":"英格兰长弓","cats":["弓弩"]},{"name":"反曲弓","desc":"弧形弓身","cats":["弓弩"]},{"name":"复合弓","desc":"滑轮复合","cats":["弓弩"]},{"name":"短弓","desc":"短身弓","cats":["弓弩"]},{"name":"骑弓","desc":"骑兵短弓","cats":["弓弩"]},{"name":"日本和弓","desc":"长身不对称弓","cats":["弓弩"]},{"name":"中国角弓","desc":"复合角弓","cats":["弓弩"]},{"name":"弩","desc":"机械发射","cats":["弓弩"]},{"name":"手弩","desc":"单手小弩","cats":["弓弩"]},{"name":"重弩","desc":"大型弩","cats":["弓弩"]},{"name":"连弩","desc":"连续发射","cats":["弓弩"]},{"name":"十字弓","desc":"欧洲弩","cats":["弓弩"]},{"name":"弩炮","desc":"大型攻城弩","cats":["弓弩"]},{"name":"弹弩","desc":"发射弹丸","cats":["弓弩"]},{"name":"鱼弩","desc":"捕鱼用弩","cats":["弓弩"]},{"name":"箭","desc":"弓用箭矢","cats":["弓弩"]},{"name":"弩箭","desc":"弩用短箭","cats":["弓弩"]},{"name":"箭袋","desc":"装箭容器","cats":["弓弩"]},{"name":"箭筒","desc":"箭矢收纳","cats":["弓弩"]},{"name":"弓弦","desc":"备用弦","cats":["弓弩"]},{"name":"手枪","desc":"单手握持","cats":["火器"]},{"name":"左轮手枪","desc":"转轮供弹","cats":["火器"]},{"name":"半自动手枪","desc":"自动上膛","cats":["火器"]},{"name":"冲锋枪","desc":"近距离连发","cats":["火器"]},{"name":"步枪","desc":"长管单发/连发","cats":["火器"]},{"name":"突击步枪","desc":"可连发步枪","cats":["火器"]},{"name":"狙击步枪","desc":"远距精确","cats":["火器"]},{"name":"霰弹枪","desc":"散射弹丸","cats":["火器"]},{"name":"机枪","desc":"持续连发","cats":["火器"]},{"name":"轻机枪","desc":"便携连发","cats":["火器"]},{"name":"重机枪","desc":"固定连发","cats":["火器"]},{"name":"榴弹发射器","desc":"发射榴弹","cats":["火器"]},{"name":"火箭筒","desc":"发射火箭弹","cats":["火器"]},{"name":"迫击炮","desc":"曲射火炮","cats":["火器"]},{"name":"烟雾弹","desc":"释放烟雾","cats":["火器"]},{"name":"闪光弹","desc":"强光致盲","cats":["火器"]},{"name":"催泪弹","desc":"释放催泪","cats":["火器"]},{"name":"地雷","desc":"地面爆炸","cats":["火器"]},{"name":"炸药包","desc":"定时/遥控","cats":["火器"]},{"name":"火铳","desc":"早期火器","cats":["火器"]},{"name":"火绳枪","desc":"火绳点火","cats":["火器"]},{"name":"燧发枪","desc":"燧石点火","cats":["火器"]},{"name":"加农炮","desc":"大口径火炮","cats":["火器"]},{"name":"舰炮","desc":"舰载火炮","cats":["火器"]},{"name":"鞭","desc":"皮革/金属鞭","cats":["特殊"]},{"name":"峨眉刺","desc":"双头短刺","cats":["特殊"]},{"name":"判官笔","desc":"短笔形兵","cats":["特殊"]},{"name":"点穴笔","desc":"细长笔形","cats":["特殊"]},{"name":"扇","desc":"铁扇/折扇","cats":["特殊"]},{"name":"铁伞","desc":"伞形兵器","cats":["特殊"]},{"name":"铁笛","desc":"笛形兵器","cats":["特殊"]},{"name":"铁箫","desc":"箫形兵器","cats":["特殊"]},{"name":"烟杆","desc":"长杆烟具","cats":["特殊"]},{"name":"拂尘","desc":"软兵器","cats":["特殊"]},{"name":"手甲","desc":"金属护手","cats":["特殊"]},{"name":"拳刃","desc":"手背刃","cats":["特殊"]},{"name":"爪刃","desc":"爪形刃","cats":["特殊"]},{"name":"袖剑","desc":"臂藏短剑","cats":["特殊"]},{"name":"臂刃","desc":"臂装刀刃","cats":["特殊"]},{"name":"腿刃","desc":"腿装刀刃","cats":["特殊"]},{"name":"鞋刃","desc":"鞋藏刀刃","cats":["特殊"]},{"name":"腰带剑","desc":"腰带藏剑","cats":["特殊"]},{"name":"伞剑","desc":"伞中藏剑","cats":["特殊"]},{"name":"笛剑","desc":"笛中藏剑","cats":["特殊"]},{"name":"烟斗枪","desc":"烟斗藏枪","cats":["特殊"]},{"name":"戒指枪","desc":"戒指藏枪","cats":["特殊"]}],"armor":[{"name":"盾","desc":"基础防御"},{"name":"圆盾","desc":"圆形小盾"},{"name":"方盾","desc":"方形大盾"},{"name":"鸢盾","desc":"风筝形盾"},{"name":"塔盾","desc":"大型立盾"},{"name":"小圆盾","desc":"轻便小盾"},{"name":"臂盾","desc":"臂装小盾"},{"name":"拳盾","desc":"手部小盾"},{"name":"头盔","desc":"头部防护"},{"name":"面甲","desc":"面部防护"},{"name":"胸甲","desc":"胸部防护"},{"name":"护肩","desc":"肩部防护"},{"name":"护臂","desc":"臂部防护"},{"name":"护腕","desc":"腕部防护"},{"name":"护手","desc":"手部防护"},{"name":"护腿","desc":"腿部防护"},{"name":"护膝","desc":"膝部防护"},{"name":"战靴","desc":"足部防护"},{"name":"锁子甲","desc":"环链防护"},{"name":"板甲","desc":"整片金属甲"},{"name":"皮甲","desc":"皮革防护"},{"name":"鳞甲","desc":"鳞片防护"},{"name":"札甲","desc":"片状防护"},{"name":"布甲","desc":"厚布防护"},{"name":"藤甲","desc":"藤编防护"},{"name":"披风","desc":"轻便防护"},{"name":"护心镜","desc":"胸前圆镜"},{"name":"护颈","desc":"颈部防护"},{"name":"护胫","desc":"小腿防护"},{"name":"护踵","desc":"脚跟防护"}],"traits":[{"name":"恶魔角","race":"恶魔族","desc":"弯角，黑/红/紫","part":"头部"},{"name":"龙角","race":"龙族","desc":"粗壮后弯角","part":"头部"},{"name":"独角","race":"独角兽","desc":"额前单螺旋角","part":"头部"},{"name":"双角","race":"兽人/魔族","desc":"一对短角","part":"头部"},{"name":"盘角","race":"羊族/恶魔","desc":"螺旋盘曲","part":"头部"},{"name":"鹿角","race":"鹿族/精灵","desc":"分枝状","part":"头部"},{"name":"骨角","race":"亡灵族","desc":"骨质外露","part":"头部"},{"name":"水晶角","race":"晶族","desc":"透明晶质","part":"头部"},{"name":"火焰角","race":"火元素族","desc":"燃烧状","part":"头部"},{"name":"冰晶角","race":"冰族","desc":"冰质透明","part":"头部"},{"name":"天使光环","race":"天使族","desc":"头顶悬浮光环","part":"头部"},{"name":"暗黑光环","race":"堕天使","desc":"黑色/破损光环","part":"头部"},{"name":"星环","race":"星族","desc":"星点环绕","part":"头部"},{"name":"花冠","race":"精灵/妖精","desc":"自然花环","part":"头部"},{"name":"藤冠","race":"树精族","desc":"藤蔓编冠","part":"头部"},{"name":"骨冠","race":"亡灵族","desc":"头骨装饰","part":"头部"},{"name":"王冠角","race":"王族魔族","desc":"角与冠结合","part":"头部"},{"name":"第三眼","race":"灵族/神族","desc":"额前竖眼","part":"头部"},{"name":"额纹","race":"魔族/神族","desc":"发光纹路","part":"头部"},{"name":"头骨外露","race":"亡灵族","desc":"骷髅面部","part":"头部"},{"name":"精灵耳","race":"精灵族","desc":"尖长耳","part":"耳部"},{"name":"半精灵耳","race":"半精灵","desc":"微尖耳","part":"耳部"},{"name":"猫耳","race":"猫族","desc":"三角猫耳","part":"耳部"},{"name":"狐耳","race":"狐族","desc":"大尖狐耳","part":"耳部"},{"name":"狼耳","race":"狼族","desc":"竖立狼耳","part":"耳部"},{"name":"兔耳","race":"兔族","desc":"长垂/竖兔耳","part":"耳部"},{"name":"熊耳","race":"熊族","desc":"圆小耳","part":"耳部"},{"name":"鼠耳","race":"鼠族","desc":"圆薄耳","part":"耳部"},{"name":"鹿耳","race":"鹿族","desc":"长尖耳","part":"耳部"},{"name":"羊耳","race":"羊族","desc":"垂软耳","part":"耳部"},{"name":"牛耳","race":"牛族","desc":"横伸耳","part":"耳部"},{"name":"马耳","race":"马族","desc":"竖立耳","part":"耳部"},{"name":"狮耳","race":"狮族","desc":"圆绒耳","part":"耳部"},{"name":"虎耳","race":"虎族","desc":"圆纹耳","part":"耳部"},{"name":"豹耳","race":"豹族","desc":"圆斑耳","part":"耳部"},{"name":"龙耳","race":"龙族","desc":"鳍状耳","part":"耳部"},{"name":"鱼鳍耳","race":"人鱼族","desc":"鳍状外耳","part":"耳部"},{"name":"羽耳","race":"鸟族","desc":"羽状耳","part":"耳部"},{"name":"蝙蝠耳","race":"吸血鬼族","desc":"大薄耳","part":"耳部"},{"name":"恶魔耳","race":"恶魔族","desc":"尖长后掠","part":"耳部"},{"name":"多耳","race":"异变族","desc":"多对耳","part":"耳部"},{"name":"耳鳍","race":"水族","desc":"鳍状耳","part":"耳部"},{"name":"耳羽","race":"鸟族","desc":"耳侧羽饰","part":"耳部"},{"name":"耳环孔","race":"通用","desc":"多耳洞","part":"耳部"},{"name":"耳骨突出","race":"亡灵族","desc":"骨耳","part":"耳部"},{"name":"竖瞳","race":"龙族/猫族","desc":"猫眼竖瞳","part":"眼部"},{"name":"十字瞳","race":"魔族","desc":"十字形瞳","part":"眼部"},{"name":"星瞳","race":"星族","desc":"星形瞳","part":"眼部"},{"name":"异色瞳","race":"混血族","desc":"左右异色","part":"眼部"},{"name":"双瞳","race":"异变族","desc":"单眼双瞳","part":"眼部"},{"name":"三眼","race":"灵族","desc":"额前第三眼","part":"眼部"},{"name":"四眼","race":"异变族","desc":"两对眼","part":"眼部"},{"name":"复眼","race":"虫族","desc":"多小眼","part":"眼部"},{"name":"发光眼","race":"元素族","desc":"眼中发光","part":"眼部"},{"name":"无瞳眼","race":"亡灵族","desc":"全白/全黑","part":"眼部"},{"name":"血瞳","race":"吸血鬼","desc":"红色瞳","part":"眼部"},{"name":"金瞳","race":"龙族/神族","desc":"金色瞳","part":"眼部"},{"name":"银瞳","race":"精灵/神族","desc":"银色瞳","part":"眼部"},{"name":"紫瞳","race":"魔族","desc":"紫色瞳","part":"眼部"},{"name":"异形瞳","race":"魔族","desc":"花纹瞳","part":"眼部"},{"name":"眼纹","race":"魔族/兽族","desc":"眼周纹路","part":"眼部"},{"name":"泪痕纹","race":"兽族","desc":"眼下纹路","part":"眼部"},{"name":"眼罩","race":"通用","desc":"单眼遮罩","part":"眼部"},{"name":"眼纱","race":"通用","desc":"薄纱覆眼","part":"眼部"},{"name":"眼饰","race":"通用","desc":"眼角装饰","part":"眼部"},{"name":"天使羽翼","race":"天使族","desc":"白色羽翼","part":"背部"},{"name":"堕天使翼","race":"堕天使","desc":"黑色羽翼","part":"背部"},{"name":"恶魔翼","race":"恶魔族","desc":"蝙蝠状膜翼","part":"背部"},{"name":"龙翼","race":"龙族","desc":"大型膜翼","part":"背部"},{"name":"精灵翼","race":"妖精族","desc":"透明薄翼","part":"背部"},{"name":"蝴蝶翼","race":"蝶族","desc":"花纹大翼","part":"背部"},{"name":"蛾翼","race":"蛾族","desc":"绒面翼","part":"背部"},{"name":"蜻蜓翼","race":"虫族","desc":"细长透明翼","part":"背部"},{"name":"甲虫翼","race":"虫族","desc":"硬壳翼","part":"背部"},{"name":"鸟翼","race":"鸟族","desc":"羽翼","part":"背部"},{"name":"蝙蝠翼","race":"蝙蝠族","desc":"膜翼","part":"背部"},{"name":"骨翼","race":"亡灵族","desc":"骨质翼","part":"背部"},{"name":"机械翼","race":"机械族","desc":"金属翼","part":"背部"},{"name":"水晶翼","race":"晶族","desc":"晶质翼","part":"背部"},{"name":"火焰翼","race":"火元素族","desc":"燃烧翼","part":"背部"},{"name":"冰翼","race":"冰族","desc":"冰质翼","part":"背部"},{"name":"光翼","race":"光族","desc":"发光翼","part":"背部"},{"name":"暗翼","race":"暗族","desc":"暗影翼","part":"背部"},{"name":"星翼","race":"星族","desc":"星点翼","part":"背部"},{"name":"多翼","race":"异变族","desc":"多对翼","part":"背部"},{"name":"背鳍","race":"人鱼族","desc":"背部鳍","part":"背部"},{"name":"背甲","race":"龟族/龙族","desc":"背部甲壳","part":"背部"},{"name":"背棘","race":"龙族/蜥族","desc":"背部尖刺","part":"背部"},{"name":"背羽","race":"鸟族","desc":"背部羽毛","part":"背部"},{"name":"背纹","race":"兽族","desc":"背部纹路","part":"背部"},{"name":"猫尾","race":"猫族","desc":"细长猫尾","part":"尾部"},{"name":"狐尾","race":"狐族","desc":"蓬松大尾","part":"尾部"},{"name":"狼尾","race":"狼族","desc":"粗壮狼尾","part":"尾部"},{"name":"兔尾","race":"兔族","desc":"圆球短尾","part":"尾部"},{"name":"鼠尾","race":"鼠族","desc":"细长无毛尾","part":"尾部"},{"name":"狮尾","race":"狮族","desc":"末端毛簇","part":"尾部"},{"name":"虎尾","race":"虎族","desc":"环纹粗尾","part":"尾部"},{"name":"豹尾","race":"豹族","desc":"斑点长尾","part":"尾部"},{"name":"龙尾","race":"龙族","desc":"粗壮鳞尾","part":"尾部"},{"name":"蜥尾","race":"蜥族","desc":"长鳞尾","part":"尾部"},{"name":"蛇尾","race":"蛇族","desc":"无足蛇身","part":"尾部"},{"name":"鱼尾","race":"人鱼族","desc":"鱼鳍尾","part":"尾部"},{"name":"鲨尾","race":"鲨族","desc":"鳍状尾","part":"尾部"},{"name":"蝎尾","race":"蝎族","desc":"带刺尾","part":"尾部"},{"name":"恶魔尾","race":"恶魔族","desc":"尖端心形/箭头","part":"尾部"},{"name":"骨尾","race":"亡灵族","desc":"骨质尾","part":"尾部"},{"name":"多尾","race":"狐族/异变族","desc":"多条尾","part":"尾部"},{"name":"羽尾","race":"鸟族","desc":"羽状尾","part":"尾部"},{"name":"水晶尾","race":"晶族","desc":"晶质尾","part":"尾部"},{"name":"火焰尾","race":"火元素族","desc":"燃烧尾","part":"尾部"},{"name":"兽爪","race":"兽族","desc":"尖锐爪","part":"四肢"},{"name":"猫爪","race":"猫族","desc":"可伸缩爪","part":"四肢"},{"name":"龙爪","race":"龙族","desc":"粗壮鳞爪","part":"四肢"},{"name":"鹰爪","race":"鸟族","desc":"弯曲利爪","part":"四肢"},{"name":"蹄","race":"马族/羊族","desc":"硬质蹄","part":"四肢"},{"name":"分趾蹄","race":"羊族","desc":"两瓣蹄","part":"四肢"},{"name":"蹼","race":"水族","desc":"指间蹼","part":"四肢"},{"name":"鳍","race":"鱼族","desc":"四肢鳍","part":"四肢"},{"name":"触手","race":"海族/异变族","desc":"软体触手","part":"四肢"},{"name":"多臂","race":"异变族","desc":"多条手臂","part":"四肢"},{"name":"多足","race":"虫族","desc":"多条腿","part":"四肢"},{"name":"骨手","race":"亡灵族","desc":"骨质手","part":"四肢"},{"name":"机械臂","race":"机械族","desc":"金属臂","part":"四肢"},{"name":"义肢","race":"通用","desc":"替代肢体","part":"四肢"},{"name":"鳞臂","race":"龙族/蜥族","desc":"鳞片覆盖","part":"四肢"},{"name":"羽臂","race":"鸟族","desc":"羽覆手臂","part":"四肢"},{"name":"毛臂","race":"兽族","desc":"毛覆手臂","part":"四肢"},{"name":"爪足","race":"兽族","desc":"兽爪足","part":"四肢"},{"name":"蹄足","race":"兽族","desc":"蹄形足","part":"四肢"},{"name":"尾骨突出","race":"亡灵族","desc":"尾椎外露","part":"四肢"},{"name":"鳞片","race":"龙族/鱼族","desc":"体表鳞片","part":"皮肤"},{"name":"细鳞","race":"人鱼族","desc":"局部细鳞","part":"皮肤"},{"name":"毛皮","race":"兽族","desc":"体表绒毛","part":"皮肤"},{"name":"羽覆","race":"鸟族","desc":"局部羽毛","part":"皮肤"},{"name":"甲壳","race":"虫族/龟族","desc":"硬质甲壳","part":"皮肤"},{"name":"骨甲","race":"亡灵族","desc":"骨质外露","part":"皮肤"},{"name":"晶肤","race":"晶族","desc":"半透明晶质","part":"皮肤"},{"name":"发光肤","race":"元素族","desc":"体表发光","part":"皮肤"},{"name":"暗影肤","race":"暗族","desc":"吸收光","part":"皮肤"},{"name":"星纹","race":"星族","desc":"体表星点","part":"皮肤"},{"name":"魔纹","race":"魔族","desc":"发光纹路","part":"皮肤"},{"name":"咒纹","race":"通用","desc":"封印/祝福纹","part":"皮肤"},{"name":"兽纹","race":"兽族","desc":"斑纹","part":"皮肤"},{"name":"花纹","race":"蝶族","desc":"花纹","part":"皮肤"},{"name":"水纹","race":"水族","desc":"波纹","part":"皮肤"},{"name":"火纹","race":"火族","desc":"火焰纹","part":"皮肤"},{"name":"冰纹","race":"冰族","desc":"冰晶纹","part":"皮肤"},{"name":"树纹","race":"树精族","desc":"木纹","part":"皮肤"},{"name":"石纹","race":"石族","desc":"石质纹","part":"皮肤"},{"name":"透明肤","race":"幽灵族","desc":"半透明","part":"皮肤"},{"name":"幽灵尾迹","race":"幽灵族","desc":"下半身虚化","part":"全身"},{"name":"火焰身","race":"火元素族","desc":"全身燃烧","part":"全身"},{"name":"水流身","race":"水元素族","desc":"全身水流","part":"全身"},{"name":"烟雾身","race":"风元素族","desc":"全身烟雾","part":"全身"},{"name":"岩石身","race":"石族","desc":"全身岩石","part":"全身"},{"name":"树木身","race":"树精族","desc":"全身木质","part":"全身"},{"name":"机械身","race":"机械族","desc":"全身机械","part":"全身"},{"name":"骷髅身","race":"亡灵族","desc":"全身骨架","part":"全身"},{"name":"半透明身","race":"幽灵族","desc":"半透明","part":"全身"},{"name":"多首","race":"异变族","desc":"多个头","part":"全身"},{"name":"巨化","race":"巨人族","desc":"体型巨大","part":"全身"},{"name":"迷你化","race":"妖精族","desc":"体型娇小","part":"全身"},{"name":"变形","race":"变形族","desc":"可变化形态","part":"全身"},{"name":"分身","race":"幻族","desc":"可分裂","part":"全身"},{"name":"影子身","race":"暗族","desc":"影子形态","part":"全身"},{"name":"光环环绕","race":"神族","desc":"全身光环","part":"全身"},{"name":"星尘环绕","race":"星族","desc":"星尘环绕","part":"全身"},{"name":"花瓣环绕","race":"花精族","desc":"花瓣飘浮","part":"全身"},{"name":"羽毛环绕","race":"鸟族","desc":"羽毛飘浮","part":"全身"},{"name":"鳞粉","race":"蝶族","desc":"鳞粉飘散","part":"全身"}]};</script>
+<script>/* 世界设定数据：七大自治区 / 姓名 / 圣灵 / 灵种 / 评级 / 所属
+ * 依据《天外飞仙柳素·世界观合并设定集》与《圣灵图鉴·位格体系》整理。
+ * 想改词条直接改这里，再跑 _build_cg_html.py 即可。
+ */
+(function (global) {
+  'use strict';
+
+  /* 七个自治区（定稿七区）。姓名按自治区所属文化分池；圣灵体系不与此绑定。 */
+  var ORIGINS = [
+    { name: '山海经', note: '赤曜 · 炎黄大地', culture: '华夏' },
+    { name: '瓦尔哈拉', note: '英灵与怪物的北境', culture: '北欧' },
+    { name: '塔尔塔洛斯', note: '深渊之下', culture: '希腊' },
+    { name: '百鬼夜行', note: '日本 · 妖异之国', culture: '日本' },
+    { name: '赤色凛冬', note: '苏联 · 永冻的红色大地', culture: '斯拉夫' },
+    { name: '亚特兰蒂斯', note: '海洋 · 沉没的潮汐文明', culture: '海洋' },
+    { name: '伊甸', note: '圣书之地 · 乐园故址', culture: '希伯来' }
+  ];
+
+  /* 灵种：决定灵力属性 */
+  var LINGZHONG = [
+    { name: '炎灵种', element: '火', w: 1, desc: '灵力炽烈，术式威力高、消耗也大，情绪激动时容易外溢。' },
+    { name: '潮灵种', element: '水', w: 1, desc: '灵力绵长流转，擅长持续输出与形态变化，控场见长。' },
+    { name: '霜灵种', element: '冰', w: 1, desc: '灵力凝滞如霜，封印、减速、护盾类术式格外牢固。' },
+    { name: '雷灵种', element: '雷', w: 1, desc: '灵力锋锐急促，爆发极快、续航偏弱，讲求一击制敌。' },
+    { name: '风灵种', element: '风', w: 1, desc: '灵力轻捷，擅移动、切割与远程牵引，负重高时效率下降。' },
+    { name: '岩灵种', element: '土', w: 1, desc: '灵力厚重沉稳，防御与承载出众，转圜偏慢。' },
+    { name: '青灵种', element: '木', w: 1, desc: '灵力温润生发，治愈、催生与缠缚为其所长。' },
+    { name: '曦灵种', element: '光', w: 1, desc: '灵力明净，净化污秽与增益友军效果显著，惧怕遮蔽之地。' },
+    { name: '冥灵种', element: '暗', w: 1, desc: '灵力沉滞幽深，侵蚀、隐匿与精神干扰见长，代价是不易被治愈。' },
+    { name: '无色灵种', element: '无', w: 0.12, desc: '罕见：灵力本身不带属性，可短时摹拟任意属性，效率略低。' }
+  ];
+
+  /* 灵力评级 F–SS（对应设定集 6.8 实力评级） */
+  var RATINGS = [
+    { g: 'F', p: 15, desc: '有灵力，只能被动护体' },
+    { g: 'E', p: 20, desc: '可用基础灵术的普通人' },
+    { g: 'D', p: 22, desc: '风林火山基层士兵' },
+    { g: 'C', p: 20, desc: '普通游击士 / 小队队长' },
+    { g: 'B', p: 13, desc: '优秀游击士 / 分团团长' },
+    { g: 'A', p: 7, desc: '精锐游击士 / 风林火山将军' },
+    { g: 'S', p: 2.5, desc: '天人 · 异兽霸主级' },
+    { g: 'SS', p: 0.5, desc: '圣人 · 传说级' }
+  ];
+
+  /* 神灵类圣灵：神话人物 / 神兽 / 名器，带位格 */
+  var DIVINE = [
+    /* —— 山海经（圣灵图鉴十灵 + 四圣守 + 四凶 + 名器）—— */
+    { name: '金乌·大曜', system: '华夏', form: '神兽', rank: '圣格', tier: '上', power: '太阳真火，十日凌空，暗影与污秽无所遁形' },
+    { name: '应龙·沧溟', system: '华夏', form: '神兽', rank: '圣格', tier: '上', power: '呼风唤雨、水淹三军，雨幕之中来去无踪' },
+    { name: '烛龙·晦明', system: '华夏', form: '神兽', rank: '圣格', tier: '上', power: '睁眼为昼、闭眼为夜，光阴领域内快慢由心' },
+    { name: '麒麟·仁光', system: '华夏', form: '神兽', rank: '圣格', tier: '中', power: '祥瑞领域：净化污秽、治愈友军、削弱怪异' },
+    { name: '白泽·知渊', system: '华夏', form: '神兽', rank: '圣格', tier: '中', power: '全知领域：可预判、拆解、反制敌方一切行动' },
+    { name: '九尾·惑心', system: '华夏', form: '神兽', rank: '圣格', tier: '中', power: '九重幻境层层嵌套，梦中之伤化为现实之创' },
+    { name: '饕餮·噬渊', system: '华夏', form: '神兽', rank: '圣格', tier: '中', power: '吞噬领域：灵力、攻击乃至空间皆被吞入「无」' },
+    { name: '毕方·燎原', system: '华夏', form: '神兽', rank: '圣格', tier: '中', power: '火海领域：火焰不灭、连环爆燃，踏火而行' },
+    { name: '刑天·不屈', system: '华夏', form: '英灵', rank: '圣格', tier: '中', power: '战意领域：越倒下越强，濒死之际战力最盛' },
+    { name: '精卫·填海', system: '华夏', form: '英灵', rank: '圣格', tier: '下', power: '执念领域：每次攻击留下不可磨灭的侵蚀，层层叠加' },
+    { name: '青龙', system: '华夏', form: '神兽', rank: '圣格', tier: '上', power: '四圣守之首，木属东方，庇护一域、镇压气运' },
+    { name: '白虎', system: '华夏', form: '神兽', rank: '圣格', tier: '上', power: '四圣守之西，主杀伐，剑之传承留于昆仑' },
+    { name: '朱雀', system: '华夏', form: '神兽', rank: '圣格', tier: '上', power: '四圣守之南，离火焚天，涅槃而不灭' },
+    { name: '玄武', system: '华夏', form: '神兽', rank: '圣格', tier: '上', power: '四圣守之北，水与龟蛇，守御之极致' },
+    { name: '盘古斧', system: '华夏', form: '神器', rank: '神格', tier: '上', power: '开天辟地之刃，一斧分混沌、定清浊' },
+    { name: '轩辕剑', system: '华夏', form: '神器', rank: '圣格', tier: '上', power: '黄帝斩蚩尤之剑，专破邪祟与污秽' },
+    { name: '东皇钟', system: '华夏', form: '神器', rank: '神格', tier: '中', power: '钟声定序，禁锢时空、镇压一方天地' },
+    { name: '女娲石', system: '华夏', form: '神器', rank: '圣格', tier: '中', power: '补天之石，重塑形体、续接破碎之物' },
+    { name: '昆仑镜', system: '华夏', form: '神器', rank: '玄格', tier: '上', power: '照见过去与远方，亦可折返攻击于镜面' },
+    { name: '鲲鹏', system: '华夏', form: '神兽', rank: '圣格', tier: '上', power: '扶摇九万里，一翼成风、一落入海' },
+    { name: '穷奇', system: '华夏', form: '神兽', rank: '玄格', tier: '上', power: '四凶之一，食善助恶，专噬信念与护盾' },
+    { name: '梼杌', system: '华夏', form: '神兽', rank: '玄格', tier: '中', power: '顽戾不化，越被压制越难缠' },
+    { name: '混沌', system: '华夏', form: '异形', rank: '神格', tier: '下', power: '无面目之混沌，令范围内规则失序' },
+    { name: '如意金箍棒', system: '华夏', form: '神器', rank: '圣格', tier: '中', power: '随心长短、重逾山岳，一棒破万法' },
+
+    /* —— 北欧 —— */
+    { name: '冈格尼尔', system: '北欧', form: '神器', rank: '圣格', tier: '上', power: '奥丁之枪，掷出必中，中者誓约随之生效' },
+    { name: '妙尔尼尔', system: '北欧', form: '神器', rank: '圣格', tier: '上', power: '雷神之锤，落雷与粉碎，唯资格者可举' },
+    { name: '芬里尔', system: '北欧', form: '神兽', rank: '圣格', tier: '中', power: '噬神之狼，咬碎结界与束缚' },
+    { name: '耶梦加得', system: '北欧', form: '神兽', rank: '玄格', tier: '上', power: '环绕世界之蛇，毒雾与窒息的海啸' },
+    { name: '瓦尔基里', system: '北欧', form: '英灵', rank: '玄格', tier: '中', power: '择死者入殿，战场上牵引胜负与士气' },
+    { name: '尤克特拉希尔', system: '北欧', form: '异形', rank: '神格', tier: '下', power: '世界树之枝，连接九界、治愈与寄生并存' },
+
+    /* —— 希腊 —— */
+    { name: '宙斯之雷霆', system: '希腊', form: '神器', rank: '神格', tier: '上', power: '万钧雷霆，裁决众生，天候随之而动' },
+    { name: '波塞冬三叉戟', system: '希腊', form: '神器', rank: '圣格', tier: '上', power: '撼动海陆，地震与巨浪听其号令' },
+    { name: '埃癸斯', system: '希腊', form: '神器', rank: '圣格', tier: '中', power: '雅典娜之盾，映出恐惧、挡下必杀' },
+    { name: '阿喀琉斯', system: '希腊', form: '英灵', rank: '玄格', tier: '上', power: '不坏之躯与无匹枪术，唯踵为弱' },
+    { name: '美杜莎', system: '希腊', form: '异形', rank: '玄格', tier: '中', power: '石化之瞳，视之者躯体渐次凝固' },
+    { name: '刻耳柏洛斯', system: '希腊', form: '神兽', rank: '灵格', tier: '上', power: '守门之犬，吞噬逃遁者、封锁退路' },
+
+    /* —— 埃及 —— */
+    { name: '阿努比斯', system: '埃及', form: '神祇', rank: '圣格', tier: '中', power: '称量心脏，裁断生死、驱策亡者' },
+    { name: '荷鲁斯之眼', system: '埃及', form: '神器', rank: '圣格', tier: '中', power: '洞悉真伪、破除幻术，亦可降下王权之威' },
+    { name: '拉之太阳船', system: '埃及', form: '神器', rank: '神格', tier: '下', power: '乘日而行，昼夜之间瞬移与灼烧' },
+
+    /* —— 日本 —— */
+    { name: '天照', system: '日本', form: '神祇', rank: '神格', tier: '中', power: '日轮与镜，照彻幽暗、驱逐邪祟' },
+    { name: '须佐之男', system: '日本', form: '神祇', rank: '圣格', tier: '上', power: '斩蛇之剑与风暴，暴烈而守序' },
+    { name: '八岐大蛇', system: '日本', form: '神兽', rank: '圣格', tier: '中', power: '八首八尾，毒与洪水，被斩亦再生' },
+    { name: '伊吹童子', system: '日本', form: '异形', rank: '玄格', tier: '上', power: '鬼之血脉，酒气化雾、蛮力裂山' },
+    { name: '草薙剑', system: '日本', form: '神器', rank: '圣格', tier: '中', power: '斩火之刃，风压随之，一剑断炎' },
+
+    /* —— 天启（天使 / 圣遗物）—— */
+    { name: '大天使长米迦勒', system: '天启', form: '神祇', rank: '圣格', tier: '上', power: '天秤与焰剑，裁断罪业、统御天使军团' },
+    { name: '加百列', system: '天启', form: '神祇', rank: '圣格', tier: '中', power: '号角之声，唤醒、鼓舞与宣告' },
+    { name: '堕天使路西法', system: '天启', form: '神祇', rank: '圣格', tier: '上', power: '晨星之光，魅惑与堕落，以光为刃' },
+    { name: '朗基努斯之枪', system: '天启', form: '神器', rank: '圣格', tier: '中', power: '贯穿一切护盾与不死性，伤口无法愈合' },
+    { name: '圣杯', system: '天启', form: '神器', rank: '玄格', tier: '上', power: '盛装奇迹，治愈与许愿，代价自付' },
+
+    /* —— 印度 / 凯尔特 —— */
+    { name: '因陀罗金刚杵', system: '印度', form: '神器', rank: '圣格', tier: '上', power: '金刚不坏之雷，破城裂山' },
+    { name: '湿婆三叉戟', system: '印度', form: '神器', rank: '神格', tier: '上', power: '毁灭与再生，一击灭世、一击复生' },
+    { name: '迦楼罗', system: '印度', form: '神兽', rank: '玄格', tier: '上', power: '金翅大鹏，食龙、破毒、速度冠绝' },
+    { name: '王者之剑', system: '凯尔特', form: '神器', rank: '圣格', tier: '上', power: '断钢之剑，王权加护、剑光如日' },
+    { name: '库丘林', system: '凯尔特', form: '英灵', rank: '玄格', tier: '上', power: '荆棘之枪，必中之刺与狂战之姿' }
+  ];
+
+  /* 元素类圣灵：带元素属性与强化方向 */
+  var ELEMENTAL = [
+    { name: '焚天赤莲', element: '火', boost: '攻击', power: '绽开即焚，莲花所及尽成焦土' },
+    { name: '炽阳之核', element: '火', boost: '强化', power: '灵力附带高温，术式威力递增、消耗加剧' },
+    { name: '燎原火种', element: '火', boost: '领域', power: '一点星火蔓延成野火领域，越烧越旺' },
+    { name: '熔心之炉', element: '火', boost: '恢复', power: '以灼烧换取灵力回转，伤愈快、痛感也强' },
+
+    { name: '潮汐之海', element: '水', boost: '控制', power: '召唤潮汐吞没战场，敌方行动迟滞、阵型被冲散' },
+    { name: '深潭之镜', element: '水', boost: '感知', power: '水面映照四周，可借水影观察与传递讯息' },
+    { name: '沧溟之息', element: '水', boost: '恢复', power: '水雾环绕，缓慢修补伤势与灵力通道' },
+    { name: '涌泉之心', element: '水', boost: '强化', power: '灵力绵延不绝，长时间作战不掉档' },
+
+    { name: '深寒之柱', element: '冰', boost: '防御', power: '升起冰柱成墙，格挡后反震寒气' },
+    { name: '疾天寒', element: '冰', boost: '速度', power: '踏霜而行，身形快如寒流掠过' },
+    { name: '霜华之冠', element: '冰', boost: '控制', power: '冠冕所罩之处，动作与术式一并凝滞' },
+    { name: '玄冰之棺', element: '冰', boost: '封印', power: '封敌于冰棺，亦可用于保存与延缓' },
+
+    { name: '圣炽天雷', element: '雷', boost: '攻击', power: '天雷贯落，兼有灼烧与麻痹' },
+    { name: '万钧雷霆', element: '雷', boost: '领域', power: '雷云压顶，落雷随机而密集' },
+    { name: '迅雷之翼', element: '雷', boost: '速度', power: '雷光化翼，短距瞬移与突进' },
+    { name: '鸣雷之鼓', element: '雷', boost: '强化', power: '鼓声催动心跳，全军灵术节奏加快' },
+
+    { name: '长风之刃', element: '风', boost: '攻击', power: '无形风刃，切割距离远超目视' },
+    { name: '疾风之羽', element: '风', boost: '速度', power: '身轻如羽，滞空与转向极快' },
+    { name: '回旋之风', element: '风', boost: '防御', power: '气流偏折来袭之物，以巧卸力' },
+    { name: '风暴之眼', element: '风', boost: '领域', power: '风眼之内敌方寸步难行，我方如履平地' },
+
+    { name: '磐岩之壁', element: '土', boost: '防御', power: '岩壁拔地而起，越受击打越厚实' },
+    { name: '地脉之心', element: '土', boost: '强化', power: '接引地脉，脚下大地即是灵脉补给' },
+    { name: '山河之重', element: '土', boost: '控制', power: '重力骤增，压得敌人抬不起手' },
+    { name: '尘葬之棺', element: '土', boost: '封印', power: '流沙与土石将目标封入地底' },
+
+    { name: '苍翠之森', element: '木', boost: '恢复', power: '藤木成荫，持续治愈与净化污秽' },
+    { name: '藤蔓之缚', element: '木', boost: '控制', power: '藤蔓疯长，缠绕、拖拽与限制走位' },
+    { name: '生命之芽', element: '木', boost: '治疗', power: '催生万物，断肢与重伤亦有转机' },
+    { name: '腐土之息', element: '木', boost: '攻击', power: '催腐之息，令甲胄与结界一同朽坏' },
+
+    { name: '圣辉之冕', element: '光', boost: '强化', power: '光环加身，友军灵术威力与抗性齐升' },
+    { name: '净光之雨', element: '光', boost: '治疗', power: '光雨落下，污秽与诅咒随之消解' },
+    { name: '曦光之枪', element: '光', boost: '攻击', power: '光枪贯日，对暗属与亡灵格外致命' },
+    { name: '黎明之阈', element: '光', boost: '领域', power: '领域之内黑夜退散，隐匿无所遁形' },
+
+    { name: '夜影之幕', element: '暗', boost: '隐匿', power: '影幕遮身，气息与身形一并抹去' },
+    { name: '蚀心之雾', element: '暗', boost: '控制', power: '雾中恐惧放大，敌我不分、阵脚自乱' },
+    { name: '深渊之瞳', element: '暗', boost: '感知', power: '窥视暗处与心底，读出不欲人知的秘密' },
+    { name: '噬魂之棘', element: '暗', boost: '攻击', power: '棘刺抽取灵力，越战越削弱对手' }
+  ];
+
+  /* 姓名：按自治区所属文化分池（只跟出身绑定，不跟圣灵体系绑定）
+   * 格式：nameFormat 决定 full 怎么拼 —— cn/jp 姓+名，given 只有名，ru 名·姓 */
+  var NAMES = {
+    '山海经': {
+      format: 'cn',
+      surnames: ('沈 顾 苏 谢 江 陆 云 萧 楚 白 洛 商 裴 温 姜 卫 韩 柳 叶 唐 程 秦 阮 晏 燕 宁 岑 郁 楼 黎 桑 薛 元 林 何 周 吴 郑 王 李 赵 钱 孙 杨 朱 许 胡 高 罗 宋 纪 邵 崔 钟 虞 祝 关 应 简 薄 湛 蔺 蒲 邬 甄 班 段 雷 侯 龙 万 左 石 荆 司 寇 广 臧 弓 融 谷 苗 凤 花 尉迟 长孙 慕容 上官 欧阳 端木 司徒 独孤 令狐 皇甫 诸葛 东方 南宫 北辰 申屠 呼延 澹台 公冶 宗政 濮阳 太史')
+        .split(' '),
+      givens: ('玄 昭 澜 砚 汐 瑶 翎 澈 弦 烬 墨 蘅 芜 眠 星 霄 沉 予 祈 璃 霁 岚 攸 荀 檀 照 拾 折 逐 观 逢 隐 知 千帆 长陵 未晞 清和 长风 疏影 望舒 云归 青崖 明月 长歌 时序 无咎 怀瑾 折玉 沉璧 望川 临霜 雪见 素问 停云 扶光 溯月 昭华 白露 玄英 惊蛰 谷雨 小满 芒种 霜降 既明 无衣 子衿 鹿鸣 采薇 蒹葭 桃夭 鹤鸣 甘棠 白华 嘉鱼 湛露 彤弓 青梧 碧城 玉京 绛雪 朱砂 素练 青锋 白虹 赤霄 沧浪 濯缨 洞庭 潇湘 若木 空桑 重明 抱朴 守拙 藏锋 问津 拂衣 解舟 系舟 归舟 停舟 拾薪 煮石 煎雪 焙茶 听松 倚竹 踏月 分灯 挑灯 掩卷 焚香 扫阶 叩关 推山 填海 移山')
+        .split(' '),
+      titles: ('断月 霜语 赤鸦 千机 无相 焚天 沉钟 白鲸 铁蔷薇 星陨 长夜 龙骨 银沙 血樱 空棺 三途 归墟 焚书 荆棘 渡鸦 天狼 孤星 琥珀 镜海 铜雀 灰烬 青锋 寒山 云篆 玄鸟 金乌 望舒 羲和 燃犀 折枝 拾光 烬海 溯洄 咫尺 苍白 无名 洗剑 听雨 负薪 守夜 燃灯')
+        .split(' ')
+    },
+    '百鬼夜行': {
+      format: 'jp',
+      surnames: ('藤原 源 平 橘 织田 明智 上杉 武田 真田 伊达 毛利 岛津 九条 西园寺 土御门 安倍 贺茂 芦屋 小野 坂上 大江 菅原 清原 中原 高阶 藤堂 井伊 榊原 本多 前田 浅井 朝仓 尼子 大内 大友 龙造寺 相良 伊东 北条 足利 细川 山名 神保 畠山 今川 三好 松永 筒井 蒲生 佐竹 结城 宇都宫 那须 南部 津轻 秋田 最上 相马 千叶 三浦 梶原 比企 熊谷 畑 时 二阶堂 工藤 菊池 阿苏 大祝 诹访 户隐 出云 贺茂')
+        .split(' '),
+      givens: ('雪乃 千鹤 隼人 龙之介 葵 椿 咲夜 宵 凛 澪 栞 雫 枫 莲 阳菜 结衣 美咲 诗织 静 千夏 遥 凑 苍 光 萤 忍 迅 影 玄斋 十兵卫 小太郎 新之助 与一 小百合 小春 千代 万叶 若菜 早苗 夕雾 朝颜 桔梗 菖蒲 龙胆 紫苑 白菊 红叶 初音 时雨 雪绪 月代 星罗 天音 铃音 花凛 神乐 雏 鹤 千寻 凉 澪标 冬真 春臣 夏彦 秋人 影虎 鬼一 鬼丸 大和 武藏 甲斐 信浓 出羽 备前 长门 周防 石见')
+        .split(' '),
+      titles: ('不知火 蜃气楼 夜叉 鬼哭 紫电 月影 白夜 胧月 神乐 六花 千鸟 绫罗 蛇眼 狐火 无明 刹那 桔梗 红莲 净土 梦见 鬼灯 雨月 霜月 文月 弥生')
+        .split(' ')
+    },
+    '瓦尔哈拉': {
+      format: 'given',
+      givensM: ('比约恩 西格蒙德 哈拉尔 拉格纳 伊瓦尔 斯诺里 埃里克 莱夫 卡尔 奥拉夫 索尔斯坦 贡纳尔 赫里克 斯泰因 霍德尔 维达 乌尔夫 斯温 基尔 芬恩 阿尔夫 奥塔尔 埃纳尔 英瓦尔 阿斯比约恩 古德蒙德 赫罗尔夫 斯韦恩 托基尔 阿恩 盖尔 索尔格里姆')
+        .split(' '),
+      givensF: ('阿斯翠德 芙蕾雅 西格丽德 布伦希尔德 古德伦 英格丽 阿斯特丽德 托拉 兰维格 索尔薇 格蕾塔 希尔达 兰迪 托芙 赛拉 乌尔里卡 拉格娜 赫尔加')
+        .split(' '),
+      titles: ('铁手 血斧 霜狼 鸦语 雷歌 断誓 石心 白熊 长船 冬牙 金环 狼嚎 折桨 灰帆 碎盾 独眼')
+        .split(' ')
+    },
+    '塔尔塔洛斯': {
+      format: 'given',
+      givensM: ('卡戎 阿刻戎 忒修斯 俄耳甫斯 伊阿宋 赫克托耳 俄底修斯 阿伽门农 帕特洛克罗斯 菲罗克忒忒斯 忒勒马科斯 塔纳托斯 许普诺斯 安喀塞斯 埃涅阿斯 拉奥孔 堤厄斯忒斯 阿特柔斯 墨涅拉俄斯 俄瑞斯忒斯 达那俄斯 佩琉斯 忒拉蒙 涅索斯 阿克泰翁 卡德摩斯 珀利阿斯 墨兰波斯 安泰俄斯 达摩克里斯')
+        .split(' '),
+      givensF: ('珀耳塞福涅 安德洛玛刻 卡珊德拉 安提戈涅 克吕泰涅斯特拉 布里塞伊斯 达佛涅 阿尔刻斯提斯 美狄亚 喀耳刻 卡吕普索 珀涅罗珀 拉俄达弥亚 欧律狄刻 阿塔兰忒 希波吕忒 安提俄珀 得伊阿尼拉 赫卡柏 伊斯墨涅 欧墨尼得斯 刻瑞斯 克瑞乌萨 西比尔 海伦')
+        .split(' '),
+      titles: ('无眠者 石心 冥河渡者 青铜矛 三叉影 月桂 赭衣 无面 挽歌 断羽 持炬 影随 缄口 灰烬')
+        .split(' ')
+    },
+    '赤色凛冬': {
+      format: 'ru',
+      givensM: ('伊万 德米特里 谢尔盖 阿列克谢 尼古拉 瓦西里 米哈伊尔 亚历山大 安德烈 鲍里斯 格列布 列昂尼德 弗拉基米尔 尤里 康斯坦丁 阿尔乔姆 马克西姆 斯捷潘 帕维尔 格里高利 普罗霍尔 季莫费')
+        .split(' '),
+      givensF: ('叶卡捷琳娜 安娜 奥尔加 塔季扬娜 娜塔莉亚 斯维特兰娜 伊琳娜 玛丽亚 薇拉 柳德米拉 索尼娅 达莉娅 波琳娜 阿纳斯塔西娅 叶莲娜 加林娜 卓娅 拉伊莎 尼娜 维罗妮卡 玛尔法 阿克西尼娅')
+        .split(' '),
+      surnames: ('索科洛夫 沃尔科夫 莫罗佐夫 库兹涅佐夫 斯米尔诺夫 波波夫 列别杰夫 科兹洛夫 诺维科夫 费奥多罗夫 米哈伊洛夫 别洛夫 科马罗夫 奥尔洛夫 基谢廖夫 马卡罗夫 安德烈耶夫 伊林 古谢夫 季托夫 库德里亚绍夫 巴兰诺夫 库利科夫 阿列克谢耶夫 斯捷潘诺夫 雅科夫列夫 索罗金 谢尔盖耶夫 卡尔波夫 祖耶夫 莫尔恰诺夫 图罗夫 沙波什尼科夫 别列津 戈尔杰耶夫 丹尼洛夫 叶戈罗夫 扎伊采夫 伊格纳托夫 卡拉肖夫')
+        .split(' '),
+      titles: ('冬将军 铁幕 白桦 钢流 雪原狼 寒鸦 铁轨 无声 长夜哨 北风 灰烬城 冻土 白夜 霜原')
+        .split(' ')
+    },
+    '亚特兰蒂斯': {
+      format: 'given',
+      givensM: ('涅柔斯 特里同 阿特拉斯 普罗透斯 格劳科斯 俄刻阿诺斯 福耳库斯 阿特兰 塞拉菲斯 涅瑞德 卡里昂 俄瑞斯 达那俄斯 佩琉斯 忒拉蒙 涅索斯 阿克泰翁 卡德摩斯 珀利阿斯 墨兰波斯 安泰俄斯 特里托尼斯 达摩克里斯 波尔斐里翁 伊斯墨诺斯')
+        .split(' '),
+      givensF: ('卡吕普索 忒提斯 安菲特里忒 刻托 卡律布狄斯 斯库拉 塞壬 涅瑞伊得 塔拉萨 欧律比亚 格劳刻 卡里罗厄 托俄萨 达那厄 俄斐洛忒')
+        .split(' '),
+      titles: ('沉钟 潮语 深蓝 珊瑚刃 万顷 鲛歌 蓝洞 咸风 海葬 逆流 珍珠眼 白浪 归墟 沧溟')
+        .split(' ')
+    },
+    '伊甸': {
+      format: 'given',
+      givensM: ('以撒 雅各 约瑟 便雅悯 约书亚 大卫 所罗门 以利亚 以诺 塞特 该隐 亚伯 以斯拉 尼希米 约拿 但以理 以西结 何西阿 约伯 亚伦 撒母耳 参孙 以扫 以拉 约押 耶弗他 基甸 巴拉 俄陀聂 以笏 珊迦 波阿斯 俄备得 耶西')
+        .split(' '),
+      givensF: ('路得 以斯帖 米利暗 底波拉 拉结 利亚 撒拉 夏娃 亚比该 哈拿 友尼基 吕底亚 非比 马利亚 马大 拿俄米 西坡拉 亚拿')
+        .split(' '),
+      titles: ('晨星 无花果 羔羊 荆棘冠 应许 巴别 守园 乐园 火剑 沉默 初生 圣所 吗哪 基路伯')
+        .split(' ')
+    }
+  };
+
+  /* 所属：按出身给不同势力池 */
+  var FACTIONS = {
+    '山海经': ['游击士公会', '风林火山·疾风军', '风林火山·徐林军', '风林火山·掠火军',
+      '风林火山·镇山军', '四象司', '观星寮', '清晏司', '天羽会', '百花门', '星火小队', '魔女协会'],
+    '瓦尔哈拉': ['苍天骑士团', '英灵殿卫队'],
+    '塔尔塔洛斯': ['魔女协会', '苍天骑士团', '冥河摆渡人'],
+    '百鬼夜行': ['百鬼夜行众', '阴阳寮', '御灵会', '苍天骑士团'],
+    '赤色凛冬': ['凛冬近卫军', '白桦游击队', '寒区政委部', '苍天骑士团'],
+    '亚特兰蒂斯': ['潮汐议会', '深蓝守卫', '珊瑚商盟', '苍天骑士团'],
+    '伊甸': ['圣所守园人', '晨星教团', '苍天骑士团'],
+    'default': ['苍天骑士团', '当地佣兵团', '自由商队护卫']
+  };
+
+  global.CG_LORE = {
+    origins: ORIGINS,
+    names: NAMES,
+    lingzhong: LINGZHONG,
+    ratings: RATINGS,
+    divine: DIVINE,
+    elemental: ELEMENTAL,
+    factions: FACTIONS,
+    NO_FACTION_P: 0.28
+  };
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+<script>/* 随机角色生成器 · 核心逻辑（浏览器 / Node 通用，无 DOM 依赖）
+ * 数据源：CG_DATA（由 _build_cg_data.py 从角色设计词库解析而来）
+ */
+(function (global) {
+  'use strict';
+
+  var D = global.CG_DATA;
+  var L = global.CG_LORE;
+
+  /* ============================== 随机数 ============================== */
+
+  function hash32(str) {
+    var h = 2166136261 >>> 0;
+    for (var i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619) >>> 0;
+    }
+    return h >>> 0;
+  }
+
+  function mulberry32(a) {
+    return function () {
+      a = (a + 0x6D2B79F5) >>> 0;
+      var t = a;
+      t = Math.imul(t ^ (t >>> 15), 1 | t);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function RNG(seed) {
+    this.seed = typeof seed === 'number' ? seed >>> 0 : hash32(String(seed));
+    this._f = mulberry32(this.seed);
+  }
+  RNG.prototype.next = function () { return this._f(); };
+  RNG.prototype.pick = function (arr) { return arr[Math.floor(this._f() * arr.length)]; };
+  RNG.prototype.int = function (a, b) { return a + Math.floor(this._f() * (b - a + 1)); };
+  RNG.prototype.chance = function (p) { return this._f() < p; };
+  RNG.prototype.shuffle = function (arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(this._f() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  };
+
+  /* ============================== 补充词池（原词库没有的部分） ============================== */
+  /* 姓名/称号按出身文化分池，数据在 cg_lore.js 的 NAMES 里 */
+
+  var PROFESSIONS = [
+    { n: '剑士', w: ['剑'] },
+    { n: '大剑使', w: ['剑', '长兵'] },
+    { n: '双刀客', w: ['刀', '短兵'] },
+    { n: '长枪手', w: ['长兵', '长柄'] },
+    { n: '弓手', w: ['弓弩'] },
+    { n: '弩手', w: ['弓弩'] },
+    { n: '咒术师', w: ['特殊', '长柄'] },
+    { n: '元素使', w: ['特殊'] },
+    { n: '召唤师', w: ['特殊', '长柄'] },
+    { n: '死灵法师', w: ['特殊', '长柄'] },
+    { n: '炼金术士', w: ['火器', '特殊'] },
+    { n: '符文工匠', w: ['火器', '短兵'] },
+    { n: '圣骑士', w: ['长兵', '剑'] },
+    { n: '暗杀者', w: ['短兵', '投掷'] },
+    { n: '盗贼', w: ['短兵', '投掷'] },
+    { n: '赏金猎人', w: ['弓弩', '火器'] },
+    { n: '游侠', w: ['弓弩', '剑'] },
+    { n: '吟游诗人', w: ['短兵', '特殊'] },
+    { n: '医师', w: ['短兵', '特殊'] },
+    { n: '毒师', w: ['短兵', '投掷'] },
+    { n: '驯兽师', w: ['长柄', '短兵'] },
+    { n: '龙骑士', w: ['长兵', '长柄'] },
+    { n: '机械师', w: ['火器', '特殊'] },
+    { n: '占星师', w: ['长柄', '特殊'] },
+    { n: '巫女', w: ['长柄', '特殊'] },
+    { n: '祭司', w: ['长柄', '特殊'] },
+    { n: '审判官', w: ['长兵', '剑'] },
+    { n: '佣兵', w: ['剑', '刀', '火器'] },
+    { n: '剑舞者', w: ['剑'] },
+    { n: '结界师', w: ['特殊', '长柄'] },
+    { n: '附魔师', w: ['特殊', '短兵'] },
+    { n: '香料商人', w: ['短兵'] }
+  ];
+
+  var PERSONALITIES = ('冷静寡言 外冷内热 天真烂漫 玩世不恭 拘谨守礼 偏执狂热 温柔怯懦 傲慢自负 懒散随性 忠诚固执 狡黠多疑 沉郁孤僻 热烈莽撞 谨慎多虑 温和疏离 严厉刻板 喜怒无常 洒脱不羁 麻木淡漠 口是心非')
+    .split(' ');
+
+  var EYES = [
+    { n: '琥珀', c: '#c68a3f' }, { n: '翠绿', c: '#3f8f5f' }, { n: '湛蓝', c: '#3f6fb5' },
+    { n: '血红', c: '#8c1c22' }, { n: '鎏金', c: '#d4a72c' }, { n: '银灰', c: '#b9c0c8' },
+    { n: '紫罗兰', c: '#7a5aa8' }, { n: '雾灰', c: '#8a8f96' }, { n: '漆黑', c: '#1a1a1f' },
+    { n: '浅栗', c: '#8b5a3c' }, { n: '松石绿', c: '#2f8a86' }, { n: '蜜金', c: '#c9a25a' },
+    { n: '冰蓝', c: '#8fc2d8' }, { n: '樱粉', c: '#e0a0b0' }
+  ];
+
+  /* ============================== 颜色名 -> 色块 ============================== */
+
+  var COLOR_BASE = {
+    '奶茶': '#b08968', '蜂蜜': '#d9a24a', '焦糖': '#8a4b21', '亚麻': '#c9b183',
+    '薄荷': '#8fc9a8', '樱花': '#f0b9c9', '星空': '#3a2a6e', '柠檬': '#dfe07a',
+    '黑': '#121216', '棕': '#6b4423', '栗': '#5e3a24', '金': '#c8a03c', '赤': '#a02020',
+    '红': '#a8232b', '橙': '#c96a1e', '黄': '#dfc45a', '绿': '#3f8a4c', '青': '#2f7f7a',
+    '蓝': '#2c5aa0', '紫': '#6b4a9e', '灰': '#8a8d92', '白': '#f2f0ea', '银': '#c2c7ce',
+    '粉': '#e8a0b4', '桃': '#e79a86', '冰': '#bcd9e6'
+  };
+  var COLOR_KEYS = Object.keys(COLOR_BASE).sort(function (a, b) { return b.length - a.length; });
+
+  function hexToRgb(hex) {
+    return [parseInt(hex.substr(1, 2), 16), parseInt(hex.substr(3, 2), 16), parseInt(hex.substr(5, 2), 16)];
+  }
+  function rgbToHsl(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    var mx = Math.max(r, g, b), mn = Math.min(r, g, b), h = 0, s = 0, l = (mx + mn) / 2;
+    if (mx !== mn) {
+      var d = mx - mn;
+      s = l > 0.5 ? d / (2 - mx - mn) : d / (mx + mn);
+      if (mx === r) h = (g - b) / d + (g < b ? 6 : 0);
+      else if (mx === g) h = (b - r) / d + 2;
+      else h = (r - g) / d + 4;
+      h /= 6;
+    }
+    return [h * 360, s * 100, l * 100];
+  }
+  function hslToHex(h, s, l) {
+    h = ((h % 360) + 360) % 360 / 360; s = Math.min(100, Math.max(0, s)) / 100; l = Math.min(100, Math.max(0, l)) / 100;
+    var r, g, b;
+    if (s === 0) { r = g = b = l; }
+    else {
+      var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      var p = 2 * l - q;
+      var hue = function (t) {
+        if (t < 0) t += 1; if (t > 1) t -= 1;
+        if (t < 1 / 6) return p + (q - p) * 6 * t;
+        if (t < 1 / 2) return q;
+        if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+        return p;
+      };
+      r = hue(h + 1 / 3); g = hue(h); b = hue(h - 1 / 3);
+    }
+    var to = function (x) { var v = Math.round(x * 255).toString(16); return v.length < 2 ? '0' + v : v; };
+    return '#' + to(r) + to(g) + to(b);
+  }
+
+  /** 把「樱花粉」「蓝黑」「蜂蜜棕」这类色名近似换算成色块 */
+  function colorHex(name) {
+    var key = null;
+    for (var i = 0; i < COLOR_KEYS.length; i++) {
+      if (name.indexOf(COLOR_KEYS[i]) !== -1) { key = COLOR_KEYS[i]; break; }
+    }
+    var base = key ? COLOR_BASE[key] : null;
+    var rgb = base ? hexToRgb(base) : [120, 110, 120];
+    if (!base) {
+      var h0 = hash32(name) % 360;
+      return hslToHex(h0, 32, 42);
+    }
+    var hsl = rgbToHsl(rgb[0], rgb[1], rgb[2]);
+    var h = hsl[0], s = hsl[1], l = hsl[2];
+    var has = function (w) { return name.indexOf(w) !== -1; };
+    if (has('深')) l -= 9;
+    if (has('浅')) l += 11;
+    if (has('墨')) { l -= 7; s += 4; }
+    if (has('纯')) s += 5;
+    if (has('冷')) { s -= 7; h += 6; }
+    if (has('银')) { l += 18; s -= 12; }
+    if (has('雾')) { s -= 18; l += 5; }
+    if (has('奶')) { l += 9; s -= 11; }
+    if (has('冰')) { l += 14; s -= 5; }
+    if (has('天')) l += 8;
+    if (has('海')) s += 7;
+    if (has('藏')) { l -= 12; s += 5; }
+    if (has('灰')) s -= 22;
+    if (has('酒')) { l -= 7; s += 10; }
+    if (has('火')) s += 14;
+    if (has('明')) { l += 7; s += 7; }
+    if (has('黑') && key !== '黑') { l -= 8; s += 3; }
+    if (l > 93) l = 93;
+    if (l < 6) l = 6;
+    if (s < 6) s = 6;
+    return hslToHex(h, s, l);
+  }
+
+  /* ============================== 词库视图 ============================== */
+
+  function tokens(race) {
+    return String(race || '').split('/').map(function (s) { return s.trim(); }).filter(Boolean);
+  }
+
+  var RACE_COUNT = (function () {
+    var c = {};
+    D.traits.forEach(function (t) {
+      tokens(t.race).forEach(function (r) { c[r] = (c[r] || 0) + 1; });
+    });
+    return c;
+  })();
+
+  var RACES = Object.keys(RACE_COUNT)
+    .filter(function (r) { return r !== '通用' && RACE_COUNT[r] >= 2; })
+    .sort(function (a, b) { return RACE_COUNT[b] - RACE_COUNT[a] || a.localeCompare(b, 'zh'); });
+
+  var RACE_OPTIONS = ['人类'].concat(RACES);
+
+  var SIGNATURE_PARTS = ['头部', '耳部', '背部', '尾部'];
+
+  /* 性别倾向：词库本身不区分性别，这里用名字做启发式过滤 */
+  var FEMALE_CODED = /(裙|婚纱|旗袍|和服|浴衣|女仆|护士|女巫|洛丽塔|修女|抹胸|吊带|露肩|露脐|文胸|比基尼|泳装|玛丽珍|跟鞋|高跟|头纱|面纱|新娘)/;
+  var MALE_HAIR_BAN = ['双马尾', '公主', '姬发式', '花苞', '丸子', '侧盘发', '新娘', '编发盘发', '发髻', '低盘发', '法式盘发'];
+  var HEAVY_WEAPON = /(炮|火箭筒|地雷|炸药包|重机枪|榴弹发射器)/;
+  var NONHUMAN_MARK = /(兽耳|猫耳|狐耳|兔耳|龙角|恶魔角|角饰|羽翼|光环|精灵耳)/;
+
+  /* ============================== 生成 ============================== */
+
+  function makeUsed() {
+    var s = Object.create(null);
+    return {
+      has: function (n) { return !!s[n]; },
+      add: function (n) { s[n] = 1; }
+    };
+  }
+
+  /** 从数组取一个不与已用项重名（可按 filter 过滤）的元素 */
+  function pickUnique(rng, list, used, filter) {
+    var pool = filter ? list.filter(filter) : list;
+    for (var i = 0; i < 12; i++) {
+      if (!pool.length) return null;
+      var v = rng.pick(pool);
+      if (!used.has(v.name)) { used.add(v.name); return v; }
+    }
+    return null;
+  }
+
+  function pickGender(rng, want) {
+    if (want === 'f' || want === 'm') return want;
+    return rng.chance(0.62) ? 'f' : 'm';
+  }
+
+  function pickRace(rng, want) {
+    if (want && want !== 'random') return want;
+    if (rng.chance(0.15)) return '人类';
+    return rng.pick(RACES);
+  }
+
+  function pickTraits(rng, race, used) {
+    if (race === '人类') {
+      if (!rng.chance(0.22)) return [];
+      var common = D.traits.filter(function (t) { return tokens(t.race).indexOf('通用') !== -1; });
+      var one = pickUnique(rng, common, used);
+      return one ? [one] : [];
+    }
+
+    var pool = D.traits.filter(function (t) { return tokens(t.race).indexOf(race) !== -1; });
+    if (!pool.length) pool = D.traits.filter(function (t) { return tokens(t.race).indexOf('通用') !== -1; });
+
+    var byPart = {};
+    pool.forEach(function (t) { (byPart[t.part] = byPart[t.part] || []).push(t); });
+
+    var parts = Object.keys(byPart);
+    var sig = parts.filter(function (p) { return SIGNATURE_PARTS.indexOf(p) !== -1; });
+    var sec = parts.filter(function (p) { return SIGNATURE_PARTS.indexOf(p) === -1; });
+
+    var order = [];
+    if (sig.length) order.push(rng.pick(sig));
+    var rest = rng.shuffle(sig.filter(function (p) { return order.indexOf(p) === -1; }).concat(rng.shuffle(sec)));
+
+    var want = Math.min(rng.int(2, 4), parts.length);
+    for (var i = 0; i < rest.length && order.length < want; i++) order.push(rest[i]);
+
+    var out = [];
+    order.forEach(function (p) {
+      var t = pickUnique(rng, byPart[p], used);
+      if (t) out.push(t);
+    });
+    if (out.length < 2) {
+      var extra = pickUnique(rng, D.traits.filter(function (t) {
+        return tokens(t.race).indexOf('通用') !== -1 && out.every(function (o) { return o.part !== t.part; });
+      }), used);
+      if (extra) out.push(extra);
+    }
+    // 同一"部位语义"只留一个（第三眼/三眼、恶魔耳/多耳、背甲/甲壳…）
+    var FAMILY = [
+      [/眼|瞳/, 'eye'], [/耳/, 'ear'], [/角/, 'horn'], [/尾/, 'tail'],
+      [/翼|翅|羽/, 'wing'], [/鳞|甲|壳|肤/, 'shell'], [/纹|斑/, 'mark'], [/身|体/, 'body']
+    ];
+    var famOf = function (n) {
+      for (var k = 0; k < FAMILY.length; k++) if (FAMILY[k][0].test(n)) return FAMILY[k][1];
+      return null;
+    };
+    var seenFam = {}, kept = [];
+    out.forEach(function (t) {
+      var f = famOf(t.name);
+      if (f && seenFam[f]) return;
+      if (f) seenFam[f] = 1;
+      kept.push(t);
+    });
+    return (kept.length >= 2 || out.length < 2) ? kept : out.slice(0, 2);
+  }
+
+  function buildOutfit(rng, gender, used) {
+    var A = D.apparel;
+    var male = gender === 'm';
+    var ok = function (x) { return !male || !FEMALE_CODED.test(x.name); };
+
+    var outfit = { onepiece: null, top: null, bottom: null, outer: null, footwear: null, socks: null, acc: [] };
+
+    if (rng.chance(0.42)) {
+      outfit.onepiece = pickUnique(rng, A.onepiece, used, ok);
+    }
+    if (!outfit.onepiece) {
+      outfit.top = pickUnique(rng, A.tops, used, ok);
+      outfit.bottom = pickUnique(rng, A.bottoms, used, ok);
+    }
+    if (rng.chance(0.46)) outfit.outer = pickUnique(rng, A.outers, used);
+    outfit.footwear = pickUnique(rng, A.shoes, used, ok);
+    if (rng.chance(0.62)) outfit.socks = pickUnique(rng, A.socks, used, ok);
+
+    var accN = rng.next() < 0.2 ? 0 : (rng.next() < 0.65 ? 1 : 2);
+    for (var i = 0; i < accN; i++) {
+      var a = pickUnique(rng, A.appAcc, used);
+      if (!a) break;
+      var clash = outfit.acc.some(function (x) { return x.name === a.name || (/手/.test(x.name) && /手/.test(a.name)); });
+      if (!clash) outfit.acc.push(a);
+    }
+    return outfit;
+  }
+
+  function buildHeadwear(rng, used, gender) {
+    var male = gender === 'm';
+    var n = rng.next() < 0.32 ? 0 : (rng.next() < 0.62 ? 1 : 2);
+    var picked = [];
+    for (var i = 0; i < n; i++) {
+      var cand = pickUnique(rng, D.headwear, used, function (h) {
+        if (male && FEMALE_CODED.test(h.name)) return false;
+        if (NONHUMAN_MARK.test(h.name)) return false;
+        if (picked.some(function (p) { return p.cat === h.cat; })) return false;
+        // 帽子 / 皇冠 / 发箍 都占头顶，最多选一个
+        var headtop = function (cat) { return cat === '帽子' || cat === '皇冠' || cat === '发箍'; };
+        if (headtop(h.cat) && picked.some(function (p) { return headtop(p.cat); })) return false;
+        return true;
+      });
+      if (!cand) break;
+      picked.push(cand);
+    }
+    return picked;
+  }
+
+  function buildHands(rng, used, isHuman) {
+    var H = D.hands;
+    var out = { wrist: null, handBack: null, fingers: null, handheld: null, fantasy: null };
+    if (rng.chance(0.52)) out.wrist = pickUnique(rng, H.wrist, used);
+    if (rng.chance(0.35)) out.handheld = pickUnique(rng, H.handheld, used);
+    if (rng.chance(0.3)) out.fingers = pickUnique(rng, H.fingers, used);
+    if (rng.chance(0.18)) out.handBack = pickUnique(rng, H.handBack, used);
+    if (rng.chance(isHuman ? 0.08 : 0.24)) out.fantasy = pickUnique(rng, H.handFantasy, used);
+    return out;
+  }
+
+  function pickWeapon(rng, profession, used) {
+    if (!rng.chance(0.72)) return null;
+    var pref = profession.w || [];
+    var personal = function (w) { return !HEAVY_WEAPON.test(w.name); };
+    var pool = pref.length ? D.weapons.filter(function (w) {
+      return personal(w) && w.cats.some(function (c) { return pref.indexOf(c) !== -1; });
+    }) : [];
+    if (!pool.length || rng.chance(0.25)) pool = D.weapons.filter(personal);
+    return pickUnique(rng, pool, used);
+  }
+
+  function pickArmor(rng, used) {
+    if (!rng.chance(0.34)) return null;
+    return pickUnique(rng, D.armor, used);
+  }
+
+  /** 俄式姓氏女性化：…夫→…娃，…林/金/津→…娜 */
+  function femRuSurname(s) {
+    if (/夫$/.test(s)) return s.slice(0, -1) + '娃';
+    if (/(林|金|津)$/.test(s)) return s + '娜';
+    return s + '娃';
+  }
+
+  /** 按出身文化取名：山海经/百鬼夜行 用姓+名，斯拉夫 用名·姓，其余用名 */
+  function pickName(rng, origin, gender) {
+    var cfg = (L.names && L.names[origin.name]) || L.names['山海经'];
+    var givenPool = cfg.givens || (gender === 'f' ? cfg.givensF : cfg.givensM);
+    var title = rng.pick(cfg.titles);
+    var surname = '', given = '', full;
+    switch (cfg.format) {
+      case 'cn':
+      case 'jp':
+        surname = rng.pick(cfg.surnames);
+        given = rng.pick(givenPool);
+        full = surname + given;
+        break;
+      case 'ru':
+        given = rng.pick(givenPool);
+        surname = rng.pick(cfg.surnames);
+        if (gender === 'f') surname = femRuSurname(surname);
+        full = given + '·' + surname;
+        break;
+      default:
+        given = rng.pick(givenPool);
+        full = given;
+    }
+    return { surname: surname, given: given, full: full, title: title, culture: cfg.format };
+  }
+
+  function pickAge(rng) {
+    var r = rng.next();
+    if (r < 0.26) return rng.int(14, 17);
+    if (r < 0.62) return rng.int(18, 22);
+    if (r < 0.86) return rng.int(23, 30);
+    return rng.int(31, 48);
+  }
+
+  /* ============================== 灵格：圣灵 / 灵种 / 评级 / 出身 / 所属 ============================== */
+
+  function weightedPick(rng, list, weightFn) {
+    var total = 0, i;
+    for (i = 0; i < list.length; i++) total += weightFn(list[i]);
+    var r = rng.next() * total;
+    for (i = 0; i < list.length; i++) {
+      r -= weightFn(list[i]);
+      if (r <= 0) return list[i];
+    }
+    return list[list.length - 1];
+  }
+
+  function ageFactor(age, g) {
+    var map = age <= 17
+      ? { F: 1.4, E: 1.3, D: 1.1, C: 0.9, B: 0.7, A: 0.5, S: 0.4, SS: 0.4 }
+      : age <= 22 ? {}
+      : age <= 30
+        ? { F: 0.8, E: 0.9, D: 1.0, C: 1.1, B: 1.15, A: 1.2, S: 1.2, SS: 1.2 }
+        : { F: 0.6, E: 0.8, D: 1.0, C: 1.1, B: 1.2, A: 1.3, S: 1.4, SS: 1.4 };
+    return map[g] || 1;
+  }
+
+  function buildSpirit(rng, age, wantOrigin) {
+    var origin = (wantOrigin && wantOrigin !== 'random')
+      ? (L.origins.filter(function (o) { return o.name === wantOrigin; })[0] || rng.pick(L.origins))
+      : rng.pick(L.origins);
+    var seed = weightedPick(rng, L.lingzhong, function (x) { return x.w; });
+    var rating = weightedPick(rng, L.ratings, function (x) { return x.p * ageFactor(age, x.g); });
+
+    var holy = null;
+    if (rng.chance(0.62)) {
+      if (rng.chance(0.35)) {
+        // 元素类：属性跟随灵种（无色灵种则随机）
+        var elem = seed.element === '无'
+          ? rng.pick(['火', '水', '冰', '雷', '风', '土', '木', '光', '暗'])
+          : seed.element;
+        var pool = L.elemental.filter(function (s) { return s.element === elem; });
+        var e = rng.pick(pool.length ? pool : L.elemental);
+        holy = {
+          kind: 'elemental', kindLabel: '元素类',
+          name: e.name, element: e.element, boost: e.boost, power: e.power,
+          label: e.name + '（元素类·' + e.element + '）'
+        };
+      } else {
+        // 神灵类：不绑定出身体系，任何神话的圣灵都可能降临
+        var d = rng.pick(L.divine);
+        holy = {
+          kind: 'divine', kindLabel: '神灵类',
+          name: d.name, system: d.system, form: d.form,
+          rank: d.rank, tier: d.tier, rankLabel: d.rank + (d.tier ? '·' + d.tier : ''),
+          power: d.power,
+          label: d.name + '（神灵类·' + d.system + '·' + d.rank + (d.tier ? '·' + d.tier : '') + '）'
+        };
+      }
+    }
+
+    var pool2 = L.factions[origin.name] || L.factions['default'];
+    var faction = rng.chance(L.NO_FACTION_P) ? null : rng.pick(pool2);
+
+    return { origin: origin, seed: seed, rating: rating, holy: holy, faction: faction };
+  }
+
+  function buildHair(rng, used, gender) {
+    var male = gender === 'm';
+    var color = rng.pick(D.colors);
+    var style = pickUnique(rng, D.hairStyles, used, function (s) {
+      return !male || !MALE_HAIR_BAN.some(function (b) { return s.name.indexOf(b) !== -1; });
+    }) || rng.pick(D.hairStyles);
+    return {
+      color: { name: color.name, group: color.group, hex: colorHex(color.name) },
+      style: style,
+      bangs: rng.chance(0.86) ? pickUnique(rng, D.bangs, used) : null,
+      tips: rng.chance(0.68) ? pickUnique(rng, D.tips, used) : null,
+      deco: (function () {
+        if (!rng.chance(0.42)) return null;
+        var pool = D.hairDeco.filter(function (x) {
+          if (NONHUMAN_MARK.test(x.name) || x.name.indexOf('配') === -1) return false;
+          if (male && /(盘发|公主|双马尾|新娘|花环|皇冠|蝴蝶结|丸子)/.test(x.name)) return false;
+          return true;
+        });
+        for (var attempt = 0; attempt < 6; attempt++) {
+          var cand = pickUnique(rng, pool, used);
+          if (!cand) return null;
+          // "双马尾配发带" 只取配件本身，避免和已选发型打架
+          var acc = cand.name.split('配')[1] || cand.name;
+          if (acc === '发饰') acc = '发绳';
+          if (used.has(acc)) continue;
+          used.add(acc);
+          return { name: acc, desc: cand.desc, from: cand.name };
+        }
+        return null;
+      })()
+    };
+  }
+
+  function buildEyes(rng, traits) {
+    var e = rng.pick(EYES);
+    var note = null;
+    var eyeTrait = traits.filter(function (t) {
+      return t.part === '眼部' || /瞳|眼/.test(t.name);
+    })[0];
+    if (eyeTrait) note = eyeTrait.name;
+    var hetero = rng.chance(0.09);
+    return { name: e.n, hex: e.c, note: note, hetero: hetero, alt: hetero ? rng.pick(EYES) : null };
+  }
+
+  function genderWord(gender, age) {
+    if (gender === 'f') return age <= 17 ? '少女' : '女性';
+    return age <= 17 ? '少年' : '男性';
+  }
+
+  function colorWord(name) {
+    if (/渐变$/.test(name)) return name + '的';
+    return /色$/.test(name) ? name : name + '色';
+  }
+
+  function secText(o) {
+    if (!o) return '';
+    var parts = [];
+    if (o.top) parts.push(o.top.name);
+    if (o.bottom) parts.push(o.bottom.name);
+    if (o.onepiece) parts.push(o.onepiece.name);
+    if (o.outer) parts.push('外罩' + o.outer.name);
+    if (o.socks) parts.push(o.socks.name);
+    if (o.footwear) parts.push(o.footwear.name);
+    o.acc.forEach(function (a) { parts.push(a.name); });
+    return parts.join('、');
+  }
+
+  function buildBio(c, tags) {
+    var g = genderWord(c.gender, c.age);
+    var raceText = c.race === '人类' ? '人类' : c.race;
+    var head = c.identity.title + '·' + c.identity.full;
+
+    var hairText = colorWord(c.hair.color.name) + c.hair.style.name +
+      (c.hair.bangs ? '，' + c.hair.bangs.name : '') +
+      (c.hair.tips ? '，' + c.hair.tips.name : '');
+
+    var eyeText = c.eyes.hetero && c.eyes.alt
+      ? c.eyes.name + '/' + c.eyes.alt.n + '异色瞳'
+      : c.eyes.name + '色瞳孔';
+
+    var traitText = c.traits.length ? c.traits.map(function (t) { return t.name; }).join('、') : '';
+
+    var s1 = head + '，' + g + '，' + c.age + '岁，' + raceText + (c.profession ? '·' + c.profession.n : '') + '。' + c.personality + '。';
+    var s2 = hairText + '；' + eyeText + '。' + (traitText ? '异于常人之处：' + traitText + '。' : '');
+
+    var gear = [];
+    if (c.hands.handheld) gear.push('手中常持' + c.hands.handheld.name.replace(/^手持/, ''));
+    if (c.gear.weapon) gear.push('惯用' + c.gear.weapon.name);
+    if (c.gear.armor) gear.push('披挂' + c.gear.armor.name);
+    var s3 = '着' + secText(c.outfit) + (gear.length ? '；' + gear.join('，') : '') + '。';
+
+    var sp = c.spirit;
+    var holyText = sp.holy
+      ? '圣灵「' + sp.holy.name + '」（' + (sp.holy.kind === 'divine'
+          ? '神灵类·' + sp.holy.system + '·' + sp.holy.rankLabel
+          : '元素类·' + sp.holy.element + '·' + sp.holy.boost) + '）'
+      : '尚未觉醒圣灵';
+    var s4 = holyText + '；灵种·' + sp.seed.name + '（' + (sp.seed.element === '无' ? '无属性' : sp.seed.element + '属') + '）；灵力评级 ' + sp.rating.g +
+      '；出身' + sp.origin.name + '；' + (sp.faction ? '所属' + sp.faction : '无所属') + '。';
+
+    return [s1, s2, s3, s4].join('\n');
+  }
+
+  function buildTags(c) {
+    var t = [];
+    t.push(genderWord(c.gender, c.age));
+    t.push('全身立绘');
+    if (c.race && c.race !== '人类') t.push(c.race);
+    t.push(c.hair.color.name + '发');
+    if (c.hair.style) t.push(c.hair.style.name);
+    if (c.hair.bangs) t.push(c.hair.bangs.name);
+    if (c.hair.tips) t.push(c.hair.tips.name);
+    if (c.hair.deco) t.push(c.hair.deco.name);
+    t.push(c.eyes.name + '瞳');
+    if (c.eyes.hetero) t.push('异色瞳');
+    c.traits.forEach(function (x) { t.push(x.name); });
+    c.headwear.forEach(function (x) { t.push(x.name); });
+    var o = c.outfit;
+    if (o.onepiece) t.push(o.onepiece.name);
+    if (o.top) t.push(o.top.name);
+    if (o.bottom) t.push(o.bottom.name);
+    if (o.outer) t.push(o.outer.name);
+    if (o.socks) t.push(o.socks.name);
+    t.push(o.footwear ? o.footwear.name : '');
+    o.acc.forEach(function (x) { t.push(x.name); });
+    ['wrist', 'handBack', 'fingers', 'handheld', 'fantasy'].forEach(function (k) {
+      if (c.hands[k]) t.push(c.hands[k].name);
+    });
+    if (c.gear.weapon) t.push(c.gear.weapon.name);
+    if (c.gear.armor) t.push(c.gear.armor.name);
+    t.push('二次元插画');
+    t.push('精细五官');
+    t.push('奇幻');
+    return t.filter(Boolean);
+  }
+
+  function finalize(c) {
+    c.bio = buildBio(c);
+    c.tags = buildTags(c);
+    c.prompt = c.tags.join('，');
+    return c;
+  }
+
+  function generate(opts) {
+    opts = opts || {};
+    var seed = (opts.seed === undefined || opts.seed === null || opts.seed === '') ? Math.floor(Math.random() * 1e9) : opts.seed;
+    var rng = new RNG(seed);
+    var used = makeUsed();
+
+    var gender = pickGender(rng, opts.gender);
+    var race = pickRace(rng, opts.race);
+    var traits = pickTraits(rng, race, used);
+    var hair = buildHair(rng, used, gender);
+    var eyes = buildEyes(rng, traits);
+    var headwear = buildHeadwear(rng, used, gender);
+    var outfit = buildOutfit(rng, gender, used);
+    var hands = buildHands(rng, used, race === '人类');
+    var profession = rng.pick(PROFESSIONS);
+    var gear = { weapon: pickWeapon(rng, profession, used), armor: pickArmor(rng, used) };
+    var age = pickAge(rng);
+    var spirit = buildSpirit(rng, age, opts.origin);
+    var identity = pickName(rng, spirit.origin, gender);
+
+    var c = {
+      seed: rng.seed,
+      identity: identity,
+      gender: gender,
+      age: age,
+      race: race,
+      profession: profession,
+      personality: rng.pick(PERSONALITIES),
+      hair: hair,
+      eyes: eyes,
+      headwear: headwear,
+      outfit: outfit,
+      hands: hands,
+      gear: gear,
+      spirit: spirit,
+      traits: traits
+    };
+    return finalize(c);
+  }
+
+  function generateBatch(n, opts) {
+    var out = [];
+    for (var i = 0; i < n; i++) {
+      var o = Object.assign({}, opts || {});
+      o.seed = (opts && opts.seed !== undefined && opts.seed !== null && opts.seed !== '')
+        ? String(opts.seed) + '-' + i
+        : Math.floor(Math.random() * 1e9);
+      out.push(generate(o));
+    }
+    return out;
+  }
+
+  var STATS = {
+    colors: D.colors.length,
+    hairStyles: D.hairStyles.length,
+    bangs: D.bangs.length,
+    tips: D.tips.length,
+    hairDeco: D.hairDeco.length,
+    headwear: D.headwear.length,
+    apparel: Object.keys(D.apparel).reduce(function (n, k) { return n + D.apparel[k].length; }, 0),
+    hands: Object.keys(D.hands).reduce(function (n, k) { return n + D.hands[k].length; }, 0),
+    weapons: D.weapons.length,
+    armor: D.armor.length,
+    traits: D.traits.length,
+    races: RACES.length,
+    divineSpirits: L.divine.length,
+    elementalSpirits: L.elemental.length,
+    lingzhong: L.lingzhong.length,
+    ratings: L.ratings.length,
+    origins: L.origins.length
+  };
+  STATS.total = STATS.colors + STATS.hairStyles + STATS.bangs + STATS.tips + STATS.hairDeco +
+    STATS.headwear + STATS.apparel + STATS.hands + STATS.weapons + STATS.armor + STATS.traits;
+  STATS.loreTotal = STATS.divineSpirits + STATS.elementalSpirits + STATS.lingzhong + STATS.ratings + STATS.origins;
+  STATS.nameEntries = Object.keys(L.names).reduce(function (n, k) {
+    var c = L.names[k];
+    var g = c.givens ? c.givens.length : (c.givensM.length + c.givensF.length);
+    return n + g + (c.surnames ? c.surnames.length : 0) + c.titles.length;
+  }, 0);
+
+  global.CG = {
+    generate: generate,
+    generateBatch: generateBatch,
+    finalize: finalize,
+    colorHex: colorHex,
+    races: RACES,
+    raceOptions: RACE_OPTIONS,
+    origins: L.origins,
+    professions: PROFESSIONS,
+    stats: STATS,
+    RNG: RNG
+  };
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+<script>/* 随机角色生成器 · 界面层（纯字符串渲染，可在 Node 里单独测试） */
+(function (global) {
+  'use strict';
+
+  var CG = global.CG;
+
+  var state = {
+    current: null,
+    batch: [],
+    locks: { identity: false, spirit: false, appearance: false, outfit: false, gear: false }
+  };
+
+  /* ------------------------------ 小工具 ------------------------------ */
+
+  function esc(s) {
+    return String(s === undefined || s === null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  function row(k, v, extra) {
+    var val = (v === null || v === undefined || v === '')
+      ? '<span class="none">—</span>'
+      : v;
+    return '<div class="row"><span class="k">' + esc(k) + '</span><span class="v">' + val +
+      (extra ? '<span class="sub">' + esc(extra) + '</span>' : '') + '</span></div>';
+  }
+
+  function chip(text, desc) {
+    return '<span class="chip" title="' + esc(desc || '') + '">' + esc(text) + '</span>';
+  }
+
+  function swatch(hex, name, note) {
+    return '<span class="sw" style="background:' + esc(hex) + '"></span>' + esc(name) +
+      (note ? '<span class="sub">' + esc(note) + '</span>' : '');
+  }
+
+  function itemName(x, withCat) {
+    if (!x) return null;
+    return esc(x.name) + (withCat && x.cat ? '<span class="sub">' + esc(x.cat) + '</span>' : '');
+  }
+
+  function listOrNone(arr) {
+    if (!arr || !arr.length) return null;
+    return arr.map(function (x) { return chip(x.name, x.desc || x.twist || x.base || ''); }).join('');
+  }
+
+  function genderWord(g, age) {
+    return g === 'f' ? (age <= 17 ? '少女' : '女性') : (age <= 17 ? '少年' : '男性');
+  }
+
+  /* ------------------------------ 渲染 ------------------------------ */
+
+  function renderHero(c) {
+    var accent = c.hair.color.hex || '#c8a86a';
+    var meta = [
+      genderWord(c.gender, c.age),
+      c.age + ' 岁',
+      c.race,
+      c.profession.n,
+      c.personality
+    ].map(function (t) { return '<span class="mtag">' + esc(t) + '</span>'; }).join('');
+
+    var bioLines = c.bio.split('\n').map(function (l) { return '<p>' + esc(l) + '</p>'; }).join('');
+
+    return '<div class="hero-card" style="--accent:' + esc(accent) + '">' +
+      '<div class="hero-mark" aria-hidden="true"></div>' +
+      '<div class="hero-title">' + esc(c.identity.title) + '<span class="dot">·</span>' + esc(c.identity.full) + '</div>' +
+      '<div class="hero-meta">' + meta + '</div>' +
+      '<div class="bio">' + bioLines + '</div>' +
+      '</div>';
+  }
+
+  function renderIdentity(c) {
+    var h = '';
+    h += row('姓名', esc(c.identity.full));
+    h += row('称号', esc(c.identity.title));
+    h += row('性别 / 年龄', esc(genderWord(c.gender, c.age)), c.age + ' 岁');
+    h += row('种族', esc(c.race));
+    h += row('职业', esc(c.profession.n));
+    h += row('性格', esc(c.personality));
+    h += '<div class="sep"></div>';
+    h += '<div class="row"><span class="k">异征</span><span class="v chips">' +
+      (listOrNone(c.traits) || '<span class="none">—</span>') + '</span></div>';
+    if (c.traits.length) {
+      h += '<div class="notes">' + c.traits.map(function (t) {
+        return '<div class="note"><b>' + esc(t.name) + '</b><span>' + esc(t.desc || '') + '</span></div>';
+      }).join('') + '</div>';
+    }
+    return h;
+  }
+
+  function renderAppearance(c) {
+    var h = '';
+    h += row('发色', swatch(c.hair.color.hex, c.hair.color.name, c.hair.color.group));
+    h += row('发型', itemName(c.hair.style), c.hair.style ? c.hair.style.desc : '');
+    h += row('刘海', itemName(c.hair.bangs), c.hair.bangs ? c.hair.bangs.desc : '');
+    h += row('发尾', itemName(c.hair.tips), c.hair.tips ? c.hair.tips.desc : '');
+    h += row('发饰', itemName(c.hair.deco), c.hair.deco ? c.hair.deco.desc : '');
+    h += row('瞳色', swatch(c.eyes.hex, c.eyes.name + '瞳',
+      c.eyes.hetero && c.eyes.alt ? '异色：' + c.eyes.alt.n : (c.eyes.note || '')));
+    h += '<div class="sep"></div>';
+    h += '<div class="row"><span class="k">头饰</span><span class="v chips">' +
+      (listOrNone(c.headwear) || '<span class="none">—</span>') + '</span></div>';
+    return h;
+  }
+
+  function renderOutfit(c) {
+    var o = c.outfit, h = '';
+    if (o.onepiece) h += row('连身', itemName(o.onepiece), o.onepiece.twist || '');
+    else {
+      h += row('上装', itemName(o.top), o.top ? o.top.twist : '');
+      h += row('下装', itemName(o.bottom), o.bottom ? o.bottom.twist : '');
+    }
+    h += row('外套', itemName(o.outer), o.outer ? o.outer.twist : '');
+    h += row('袜', itemName(o.socks), o.socks ? o.socks.twist : '');
+    h += row('鞋履', itemName(o.footwear), o.footwear ? o.footwear.twist : '');
+    h += '<div class="row"><span class="k">配饰</span><span class="v chips">' +
+      (listOrNone(o.acc) || '<span class="none">—</span>') + '</span></div>';
+    h += '<div class="sep"></div>';
+    var H = c.hands;
+    h += row('腕部', itemName(H.wrist), H.wrist ? H.wrist.twist : '');
+    h += row('手部', itemName(H.handBack), H.handBack ? H.handBack.twist : '');
+    h += row('指饰', itemName(H.fingers), H.fingers ? H.fingers.twist : '');
+    h += row('手持', itemName(H.handheld), H.handheld ? H.handheld.twist : '');
+    h += row('改造', itemName(H.fantasy), H.fantasy ? H.fantasy.desc || H.fantasy.twist : '');
+    return h;
+  }
+
+  function renderGear(c) {
+    var h = '';
+    h += row('武器', itemName(c.gear.weapon), c.gear.weapon ? c.gear.weapon.cats.join(' · ') : '');
+    if (c.gear.weapon && c.gear.weapon.desc) {
+      h += '<div class="notes"><div class="note"><b>特征</b><span>' + esc(c.gear.weapon.desc) + '</span></div></div>';
+    }
+    h += row('防具', itemName(c.gear.armor), c.gear.armor ? c.gear.armor.desc : '');
+    return h;
+  }
+
+  function renderSpirit(c) {
+    var s = c.spirit, h = '';
+    h += row('圣灵', s.holy
+      ? '<span class="holy">' + esc(s.holy.name) + '</span>'
+      : '<span class="none">无（尚未觉醒）</span>');
+    if (s.holy) {
+      var meta = s.holy.kind === 'divine'
+        ? '神灵类 · ' + s.holy.system + ' · ' + s.holy.form + ' · ' + s.holy.rankLabel
+        : '元素类 · ' + s.holy.element + '属 · ' + s.holy.boost + '强化';
+      h += row('类型', esc(meta));
+      h += '<div class="notes"><div class="note"><b>权能</b><span>' + esc(s.holy.power) + '</span></div></div>';
+    }
+    h += row('灵种', esc(s.seed.name), s.seed.element + '属性');
+    h += '<div class="notes"><div class="note"><b>特性</b><span>' + esc(s.seed.desc) + '</span></div></div>';
+    h += row('灵力评级', '<b class="grade">' + esc(s.rating.g) + '</b>', s.rating.desc);
+    h += row('出身', esc(s.origin.name), s.origin.note);
+    h += row('所属', s.faction ? esc(s.faction) : '<span class="none">无所属</span>');
+    return h;
+  }
+
+  function renderTags(c) {
+    return c.tags.map(function (t, i) {
+      return '<span class="tag" data-i="' + i + '">' + esc(t) + '</span>';
+    }).join('');
+  }
+
+  function renderPanels(c) {
+    return {
+      identity: renderIdentity(c),
+      spirit: renderSpirit(c),
+      appearance: renderAppearance(c),
+      outfit: renderOutfit(c),
+      gear: renderGear(c)
+    };
+  }
+
+  function cardText(c) {
+    var o = c.outfit, H = c.hands;
+    var outfit = [];
+    if (o.onepiece) outfit.push(o.onepiece.name);
+    else {
+      if (o.top) outfit.push(o.top.name);
+      if (o.bottom) outfit.push(o.bottom.name);
+    }
+    if (o.outer) outfit.push('外罩' + o.outer.name);
+    if (o.socks) outfit.push(o.socks.name);
+    if (o.footwear) outfit.push(o.footwear.name);
+    o.acc.forEach(function (a) { outfit.push(a.name); });
+
+    var hands = ['wrist', 'handBack', 'fingers', 'handheld', 'fantasy']
+      .map(function (k) { return H[k] ? H[k].name : null; }).filter(Boolean);
+
+    var lines = [];
+    lines.push('【' + c.identity.title + '·' + c.identity.full + '】' +
+      genderWord(c.gender, c.age) + ' / ' + c.age + '岁 / ' + c.race + ' / ' + c.profession.n + ' / ' + c.personality);
+    lines.push('外观：' + c.hair.color.name + '发，' + c.hair.style.name +
+      (c.hair.bangs ? '，' + c.hair.bangs.name : '') +
+      (c.hair.tips ? '，' + c.hair.tips.name : '') +
+      (c.hair.deco ? '，' + c.hair.deco.name : '') +
+      '；' + c.eyes.name + '瞳' +
+      (c.eyes.hetero && c.eyes.alt ? '（异色：' + c.eyes.alt.n + '）' : ''));
+    if (c.traits.length) lines.push('异征：' + c.traits.map(function (t) { return t.name; }).join('、'));
+    if (c.headwear.length) lines.push('头饰：' + c.headwear.map(function (t) { return t.name; }).join('、'));
+    lines.push('服饰：' + outfit.join('、'));
+    if (hands.length) lines.push('手部：' + hands.join('、'));
+    var gearNames = [c.gear.weapon ? c.gear.weapon.name : null, c.gear.armor ? c.gear.armor.name : null]
+      .filter(Boolean);
+    lines.push('装备：' + (gearNames.length ? gearNames.join(' · ') : '—'));
+    var sp = c.spirit;
+    lines.push('灵格：' + sp.seed.name + '（' + sp.seed.element + '）· 灵力评级 ' + sp.rating.g +
+      ' · 出身' + sp.origin.name + ' · ' + (sp.faction ? '所属' + sp.faction : '无所属'));
+    lines.push('圣灵：' + (sp.holy ? sp.holy.label + '｜' + sp.holy.power : '无（尚未觉醒）'));
+    lines.push('提示词：' + c.prompt);
+    return lines.join('\n');
+  }
+
+  /* ------------------------------ 锁定合并 ------------------------------ */
+
+  function mergeLocked(next, prev) {
+    if (!prev) return next;
+    if (state.locks.identity) {
+      next.identity = prev.identity;
+      next.gender = prev.gender;
+      next.age = prev.age;
+      next.race = prev.race;
+      next.profession = prev.profession;
+      next.personality = prev.personality;
+      next.traits = prev.traits;
+    }
+    if (state.locks.spirit) {
+      next.spirit = prev.spirit;
+    }
+    if (state.locks.appearance) {
+      next.hair = prev.hair;
+      next.eyes = prev.eyes;
+      next.headwear = prev.headwear;
+    }
+    if (state.locks.outfit) {
+      next.outfit = prev.outfit;
+      next.hands = prev.hands;
+    }
+    if (state.locks.gear) {
+      next.gear = prev.gear;
+    }
+    return CG.finalize(next);
+  }
+
+  /* ------------------------------ 剪贴板 / 下载 ------------------------------ */
+
+  function copyText(text, btn) {
+    var done = function () {
+      if (!btn) return;
+      var old = btn.textContent;
+      btn.textContent = '已复制';
+      btn.classList.add('ok');
+      setTimeout(function () { btn.textContent = old; btn.classList.remove('ok'); }, 1200);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { fallbackCopy(text); done(); });
+    } else {
+      fallbackCopy(text);
+      done();
+    }
+  }
+
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) { /* ignore */ }
+    document.body.removeChild(ta);
+  }
+
+  function download(filename, text) {
+    var blob = new Blob([text], { type: 'application/json;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  /* ------------------------------ 界面装配 ------------------------------ */
+
+  function init() {
+    var $ = function (id) { return document.getElementById(id); };
+    var genBtn = $('gen');
+    var seedEl = $('seed');
+    var genderEl = $('gender');
+    var raceEl = $('race');
+    var originEl = $('origin');
+    var batchPanel = $('batchPanel');
+    var batchList = $('batchList');
+
+    $('stat').textContent = '词库 ' + CG.stats.total + ' 条 · 灵格 ' + CG.stats.loreTotal + ' 条';
+    $('stat2').textContent = CG.stats.total;
+    $('stat3').textContent = CG.stats.loreTotal;
+    $('stat4').textContent = CG.stats.nameEntries;
+
+    CG.raceOptions.forEach(function (r) {
+      var opt = document.createElement('option');
+      opt.value = r;
+      opt.textContent = r;
+      raceEl.appendChild(opt);
+    });
+
+    CG.origins.forEach(function (o) {
+      var opt = document.createElement('option');
+      opt.value = o.name;
+      opt.textContent = o.name;
+      originEl.appendChild(opt);
+    });
+
+    function paint(c) {
+      state.current = c;
+      $('hero').innerHTML = renderHero(c);
+      var bodies = renderPanels(c);
+      Object.keys(bodies).forEach(function (k) {
+        var el = document.querySelector('[data-body="' + k + '"]');
+        if (el) el.innerHTML = bodies[k];
+      });
+      $('tags').innerHTML = renderTags(c);
+      seedEl.placeholder = '当前 ' + c.seed + '（留空=随机）';
+    }
+
+    function gen() {
+      var opts = { gender: genderEl.value, race: raceEl.value, origin: originEl.value };
+      var seed = seedEl.value.trim();
+      if (seed) opts.seed = seed;
+      var c = CG.generate(opts);
+      c = mergeLocked(c, state.current);
+      paint(c);
+    }
+
+    genBtn.addEventListener('click', gen);
+    genderEl.addEventListener('change', gen);
+    raceEl.addEventListener('change', gen);
+    originEl.addEventListener('change', gen);
+    seedEl.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); gen(); }
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.code !== 'Space' && e.key !== ' ') return;
+      var t = document.activeElement && document.activeElement.tagName;
+      if (t === 'INPUT' || t === 'SELECT' || t === 'TEXTAREA') return;
+      e.preventDefault();
+      gen();
+    });
+
+    document.querySelectorAll('.lock').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var k = btn.getAttribute('data-lock');
+        state.locks[k] = !state.locks[k];
+        btn.classList.toggle('locked', state.locks[k]);
+        btn.setAttribute('aria-pressed', String(state.locks[k]));
+        btn.textContent = state.locks[k] ? '🔒' : '🔓';
+        // 身份锁定时，性别 / 种族选择器同步禁用
+        if (k === 'identity') {
+          genderEl.disabled = state.locks[k];
+          raceEl.disabled = state.locks[k];
+        }
+        // 灵格锁定时，出身选择器同步禁用
+        if (k === 'spirit') {
+          originEl.disabled = state.locks[k];
+        }
+      });
+    });
+
+    $('copyPrompt').addEventListener('click', function () {
+      if (state.current) copyText(state.current.prompt, this);
+    });
+
+    $('copyAll').addEventListener('click', function () {
+      if (state.current) copyText(cardText(state.current), this);
+    });
+
+    $('exportJson').addEventListener('click', function () {
+      if (!state.current) return;
+      var c = state.current;
+      download('character-' + c.seed + '.json', JSON.stringify(c, null, 2));
+    });
+
+    $('batch').addEventListener('click', function () {
+      state.batch = CG.generateBatch(10, { gender: genderEl.value, race: raceEl.value, origin: originEl.value });
+      batchPanel.hidden = false;
+      $('exportBatch').hidden = false;
+      $('batchCount').textContent = '(' + state.batch.length + ')';
+      batchList.innerHTML = state.batch.map(function (c, i) {
+        return '<div class="bitem">' +
+          '<div class="bhead"><b>' + esc(c.identity.title + '·' + c.identity.full) + '</b>' +
+          '<span class="bmeta">' + esc(genderWord(c.gender, c.age) + ' ' + c.age + ' · ' + c.race + ' · ' + c.profession.n +
+            ' · ' + c.spirit.rating.g + '级' + (c.spirit.holy ? ' · 圣灵「' + c.spirit.holy.name + '」' : '')) + '</span>' +
+          '<button class="btn tiny" data-copy="' + i + '">复制</button></div>' +
+          '<div class="bline">' + esc(c.hair.color.name + '发 · ' + c.hair.style.name + ' · ' + c.eyes.name + '瞳' +
+            (c.traits.length ? ' · ' + c.traits.map(function (t) { return t.name; }).join('、') : '')) + '</div>' +
+          '<div class="bprompt">' + esc(c.prompt) + '</div>' +
+          '</div>';
+      }).join('');
+      batchList.querySelectorAll('[data-copy]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var idx = Number(btn.getAttribute('data-copy'));
+          copyText(cardText(state.batch[idx]), btn);
+        });
+      });
+      batchPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    $('closeBatch').addEventListener('click', function () { batchPanel.hidden = true; });
+
+    $('exportBatch').addEventListener('click', function () {
+      if (state.batch.length) download('characters-batch.json', JSON.stringify(state.batch, null, 2));
+    });
+
+    gen();
+  }
+
+  global.CG_UI = {
+    state: state,
+    renderHero: renderHero,
+    renderPanels: renderPanels,
+    renderTags: renderTags,
+    renderIdentity: renderIdentity,
+    renderSpirit: renderSpirit,
+    renderAppearance: renderAppearance,
+    renderOutfit: renderOutfit,
+    renderGear: renderGear,
+    cardText: cardText,
+    mergeLocked: mergeLocked,
+    init: init
+  };
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+  }
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+</body>
+</html>

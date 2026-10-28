@@ -1,0 +1,4 @@
+# Cloudflare Pages / Netlify 通用重定向
+# 栏目三（/news 列表）已上移为首页，旧地址 301 到 /
+/news/  /  301
+/news   /  301
