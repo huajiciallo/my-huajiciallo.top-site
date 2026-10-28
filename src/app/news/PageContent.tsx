@@ -407,13 +407,15 @@ export default function PageContent({ data, defaultMode, hideModeSwitch }: PageC
             }}
           />
         </div>
+        {/* 压暗一层：banner 换图后，深色文字直接压在亮图上会看不清 */}
+        <div className="absolute inset-0 bg-[#14110c]/55" />
         {/* 顶部细装饰线 — 主色锚点 */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-[#2563eb]/60 to-transparent" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
         {/* 底部细装饰线 */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-0.5 bg-[#2563eb] rounded-none" />
         <div className="relative h-full flex flex-col items-center justify-center px-4 text-center">
           <motion.div
-            className="text-xs font-mono tracking-[0.3em] text-[#2563eb] mb-3 font-bold"
+            className="text-xs font-mono tracking-[0.3em] text-white/70 mb-3 font-bold"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
@@ -421,7 +423,7 @@ export default function PageContent({ data, defaultMode, hideModeSwitch }: PageC
             {BANNER.eyebrow || "NEWS · 03"}
           </motion.div>
           <motion.h1
-            className="text-3xl md:text-5xl font-bold text-[#0f172a] leading-tight mb-2 tracking-wide"
+            className="text-3xl md:text-5xl font-bold text-white leading-tight mb-2 tracking-wide drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)]"
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
@@ -429,7 +431,7 @@ export default function PageContent({ data, defaultMode, hideModeSwitch }: PageC
             {BANNER.title || "新闻动态"}
           </motion.h1>
           <motion.p
-            className="text-[#475569] text-sm md:text-base max-w-3xl"
+            className="text-white/75 text-sm md:text-base max-w-3xl"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.22, ease: "easeOut" }}

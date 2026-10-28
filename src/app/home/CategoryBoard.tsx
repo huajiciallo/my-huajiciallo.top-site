@@ -288,7 +288,7 @@ export default function CategoryBoard({
       >
         <header className="flex items-center justify-between gap-4 pb-3">
           <h1 className="font-editorial text-[15px] font-bold tracking-[0.02em] text-[#14110c]/80 md:text-[17px]">
-            SC-TENT 内刊
+            亚瑠啦啦队
           </h1>
           <button
             onClick={onOpenList}

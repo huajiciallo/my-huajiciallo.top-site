@@ -56,7 +56,7 @@ const PLACEHOLDER_ARTICLE = {
   categorySlug: "industry",
   categoryName: "行业资讯",
   tag: "占位",
-  author: { name: "SC-TENT 官方", role: "占位账号" },
+  author: { name: "亚瑠啦啦队", role: "记录" },
   readTime: 1,
   summary: "",
   tags: ["占位", "样式参考", "AAAA", "BBBB", "测试"],
@@ -81,7 +81,7 @@ const PLACEHOLDER_ARTICLE = {
     "",
     "5. 容易踩的坑：\n• JSON 语法：最后一项不要有逗号\n• id 唯一：重复会导致路由冲突\n• 图片路径：用 /images/xxx.jpg（前导斜杠），文件放 public/images/ 下\n• 横条/热点版式：V23.3 设计的 15 条/页分页 + 顶部筛选对新文章自动生效",
   ],
-  source: "SC-TENT 占位发布",
+  source: "活动记录",
 };
 
 interface InnerProps {
@@ -283,7 +283,7 @@ export default function ArticleDetailInner({ category, slug }: InnerProps) {
 
         {/* 来源 */}
         <div className="mt-10 pt-6 border-t border-[#e2e8f0] text-sm text-[#94a3b8]">
-          <span>来源：{(article as any).source || "SC-TENT 官方"}</span>
+          <span>来源：{(article as any).source || "亚瑠啦啦队"}</span>
         </div>
 
         {/* 返回按钮 */}

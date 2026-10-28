@@ -19,8 +19,13 @@ const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jet
  */
 
 export const metadata: Metadata = {
-  title: "SC-TENT电子科技 - 专注电子元器件",
-  description: "SC-TENT电子科技，专注共模电感、功率电感、色环电感等电子元器件的研发与制造，为工业控制、新能源汽车等领域提供专业解决方案。",
+  title: "亚瑠啦啦队",
+  description: "亚瑠啦啦队 · 活动记录：图集 / 在线工具 / 资源",
+  openGraph: {
+    title: "亚瑠啦啦队",
+    description: "活动记录：图集 / 在线工具 / 资源",
+    type: "website",
+  },
 };
 
 export default async function RootLayout({
