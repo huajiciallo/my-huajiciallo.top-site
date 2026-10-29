@@ -58,11 +58,11 @@ export default function HomeShell({
         <PageBar
           left={
             <>
-              <span className="font-editorial text-[15px] font-bold tracking-[0.02em] text-[#14110c]/80 md:text-[17px]">
+              <span className="shrink-0 font-editorial text-[14px] font-bold tracking-[0.02em] text-[#14110c]/80 md:text-[17px]">
                 亚瑠啦啦队
               </span>
-              <span className="hidden h-3 w-px bg-[#14110c]/20 sm:block" />
-              <span className="font-mono text-[11px] tracking-[0.2em] text-[#14110c]/45">
+              <span className="hidden h-3 w-px shrink-0 bg-[#14110c]/20 sm:block" />
+              <span className="hidden truncate font-mono text-[11px] tracking-[0.2em] text-[#14110c]/45 sm:block">
                 活动总览 · {String(total).padStart(2, "0")} 篇
               </span>
             </>
@@ -70,10 +70,10 @@ export default function HomeShell({
           actions={
             <button
               onClick={() => switchTo("index")}
-              className="group inline-flex h-8 items-center gap-2 border border-[#14110c]/25 bg-white/70 px-3 font-mono text-[11px] tracking-[0.18em] text-[#14110c]/75 transition-colors hover:bg-[#14110c] hover:text-white"
+              className="group inline-flex h-8 items-center gap-1.5 border border-[#14110c]/25 bg-white/70 px-2 font-mono text-[10px] tracking-[0.14em] whitespace-nowrap text-[#14110c]/75 transition-colors hover:bg-[#14110c] hover:text-white sm:px-3 sm:text-[11px] sm:tracking-[0.18em]"
             >
               <span className="transition-transform group-hover:-translate-x-0.5">←</span>
-              返回首页
+              <span className="hidden sm:inline">返回首页</span>
             </button>
           }
         />

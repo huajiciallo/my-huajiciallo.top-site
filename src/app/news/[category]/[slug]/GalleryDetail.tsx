@@ -157,15 +157,17 @@ export default function GalleryDetail({
           <>
             <Link
               href="/"
-              className="inline-flex h-8 items-center gap-1.5 border border-[#14110c]/25 bg-white/70 px-2.5 font-mono text-[10px] tracking-[0.16em] text-[#14110c]/75 transition-colors hover:bg-[#14110c] hover:text-white md:text-[11px]"
+              aria-label="返回首页"
+              className="inline-flex h-8 items-center gap-1 whitespace-nowrap border border-[#14110c]/25 bg-white/70 px-2 font-mono text-[10px] tracking-[0.16em] text-[#14110c]/75 transition-colors hover:bg-[#14110c] hover:text-white md:px-2.5 md:text-[11px]"
             >
-              ← 返回首页
+              ← <span className="hidden sm:inline">返回首页</span>
             </Link>
             <Link
               href="/?view=list"
-              className="inline-flex h-8 items-center gap-1.5 border border-[#14110c]/25 bg-white/70 px-2.5 font-mono text-[10px] tracking-[0.16em] text-[#14110c]/75 transition-colors hover:bg-[#14110c] hover:text-white md:text-[11px]"
+              aria-label="返回总览"
+              className="inline-flex h-8 items-center gap-1 whitespace-nowrap border border-[#14110c]/25 bg-white/70 px-2 font-mono text-[10px] tracking-[0.16em] text-[#14110c]/75 transition-colors hover:bg-[#14110c] hover:text-white md:px-2.5 md:text-[11px]"
             >
-              ← 返回总览
+              ← <span className="hidden sm:inline">返回总览</span>
             </Link>
           </>
         }

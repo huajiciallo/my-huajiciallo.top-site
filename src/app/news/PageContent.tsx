@@ -401,7 +401,7 @@ export default function PageContent({ data, defaultMode, hideModeSwitch }: PageC
   };
 
   return (
-    <main className="min-h-screen bg-[#f8fafc]">
+    <main className="min-h-screen overflow-x-hidden bg-[#f8fafc]">
       {/* ============ Hero banner - P0 统一：280px + 装饰线 + 主色眉头 + 分阶入场 ============ */}
       <section className="relative h-[280px] overflow-hidden">
         <div className="absolute inset-0">
@@ -462,8 +462,8 @@ export default function PageContent({ data, defaultMode, hideModeSwitch }: PageC
       {/* ============ P2 无框文字 Tab：Bloomberg/FT 风格（彻底抛弃 chip 框） ============ */}
       <div className="max-w-6xl mx-auto px-4 md:px-8 mt-8 md:mt-12">
         {/* 顶部信息条：编号眉头 + 横向规则线 + 共 X 篇 + 清除筛选（固定位置） */}
-        <div className="flex items-baseline justify-between gap-4 mb-10">
-          <div className="flex items-baseline gap-4 md:gap-6 flex-1 min-w-0">
+        <div className="mb-6 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 sm:mb-10">
+          <div className="hidden flex-1 min-w-0 items-baseline gap-4 md:gap-6 sm:flex">
             <span className="text-sm font-mono tracking-[0.3em] text-[#94a3b8] flex-shrink-0">
               {String(tabs.length).padStart(2, "0")} / {String(tabs.length).padStart(2, "0")}
             </span>
@@ -886,15 +886,15 @@ export default function PageContent({ data, defaultMode, hideModeSwitch }: PageC
                         <p className="text-sm text-[#475569] line-clamp-1 mt-1">
                           {article.summary}
                         </p>
-                        {/* 底部信息：日期 + 分类 + 置顶标记 */}
-                        <div className="flex items-center gap-2 mt-1.5 text-xs">
-                          <span className="text-[#94a3b8]">{article.date}</span>
+                        {/* 底部信息：日期 + 分类 + 置顶标记（手机上允许换行，不竖排） */}
+                        <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+                          <span className="whitespace-nowrap text-[#94a3b8]">{article.date}</span>
                           <span className="text-[#cbd5e1]">·</span>
-                          <span className={`px-2 py-0.5 rounded-none ${getCategoryStyleLight(article.categorySlug)}`}>
+                          <span className={`whitespace-nowrap px-2 py-0.5 rounded-none ${getCategoryStyleLight(article.categorySlug)}`}>
                             {article.categoryName}
                           </span>
                           {pins[article.categorySlug] === article.id && (
-                            <span className="px-2 py-0.5 rounded-none bg-[#2563eb] text-white">
+                            <span className="whitespace-nowrap px-2 py-0.5 rounded-none bg-[#2563eb] text-white">
                               ★ 置顶
                             </span>
                           )}
@@ -903,7 +903,7 @@ export default function PageContent({ data, defaultMode, hideModeSwitch }: PageC
                               0) > 0 && (
                               <>
                                 <span className="text-[#cbd5e1]">·</span>
-                                <span className="text-[#94a3b8]">
+                                <span className="whitespace-nowrap text-[#94a3b8]">
                                   {views[
                                     `${article.categorySlug}/${article.id}`
                                   ].toLocaleString("zh-CN")}{" "}
@@ -917,7 +917,7 @@ export default function PageContent({ data, defaultMode, hideModeSwitch }: PageC
 
                     {/* 置顶按钮：每个栏目只保留一篇。
                         "全部"下不显示（置顶按栏目算），该栏目只有 1 篇时也不显示（没得选）。 */}
-                    <div className="flex items-center pr-3">
+                    <div className="flex shrink-0 items-center pr-2 sm:pr-3">
                       {activeSlug !== "all" && filteredArticles.length > 1 && (
                       <button
                         onClick={() => togglePin(article.categorySlug, article.id)}
@@ -926,7 +926,7 @@ export default function PageContent({ data, defaultMode, hideModeSwitch }: PageC
                             ? "取消置顶"
                             : "设为该栏目置顶（每栏目仅一篇）"
                         }
-                        className={`px-2.5 py-1.5 font-mono text-[10px] tracking-[0.14em] border transition-colors ${
+                        className={`whitespace-nowrap px-2 py-1.5 font-mono text-[10px] tracking-[0.1em] border transition-colors sm:px-2.5 sm:tracking-[0.14em] ${
                           pins[article.categorySlug] === article.id
                             ? "border-[#2563eb] bg-[#2563eb] text-white"
                             : "border-[#e2e8f0] text-[#94a3b8] hover:border-[#2563eb] hover:text-[#2563eb]"

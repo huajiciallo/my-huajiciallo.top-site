@@ -58,12 +58,12 @@ export default function AudioPill() {
         ›
       </button>
 
-      <span className="flex items-center border-l border-[#14110c]/15 px-2 font-mono text-[10px] tabular-nums text-[#14110c]/55">
+      <span className="hidden items-center border-l border-[#14110c]/15 px-2 font-mono text-[10px] tabular-nums text-[#14110c]/55 sm:flex">
         {String(s.index + 1).padStart(2, "0")}/{TRACKS.length}
       </span>
 
-      {/* 音量 */}
-      <div className="flex items-center border-l border-[#14110c]/15 pl-1.5 pr-2">
+      {/* 音量（手机宽度下整组隐藏，顶栏只留播放三键） */}
+      <div className="hidden items-center border-l border-[#14110c]/15 pl-1.5 pr-2 sm:flex">
         <button
           type="button"
           onClick={toggleMute}
