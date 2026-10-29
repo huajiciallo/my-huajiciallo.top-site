@@ -158,16 +158,44 @@ export default function GalleryDetail({
             <Link
               href="/"
               aria-label="返回首页"
-              className="inline-flex h-8 items-center gap-1 whitespace-nowrap border border-[#14110c]/25 bg-white/70 px-2 font-mono text-[10px] tracking-[0.16em] text-[#14110c]/75 transition-colors hover:bg-[#14110c] hover:text-white md:px-2.5 md:text-[11px]"
+              title="返回首页"
+              className="inline-flex h-8 items-center gap-1.5 whitespace-nowrap border border-[#14110c]/25 bg-white/70 px-2 font-mono text-[10px] tracking-[0.16em] text-[#14110c]/75 transition-colors hover:bg-[#14110c] hover:text-white md:px-2.5 md:text-[11px]"
             >
-              ← <span className="hidden sm:inline">返回首页</span>
+              <svg
+                className="h-3.5 w-3.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.8}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4v-5H9v5H5a1 1 0 0 1-1-1v-8.5Z" />
+              </svg>
+              <span className="hidden sm:inline">返回首页</span>
             </Link>
             <Link
               href="/?view=list"
               aria-label="返回总览"
-              className="inline-flex h-8 items-center gap-1 whitespace-nowrap border border-[#14110c]/25 bg-white/70 px-2 font-mono text-[10px] tracking-[0.16em] text-[#14110c]/75 transition-colors hover:bg-[#14110c] hover:text-white md:px-2.5 md:text-[11px]"
+              title="返回总览"
+              className="inline-flex h-8 items-center gap-1.5 whitespace-nowrap border border-[#14110c]/25 bg-white/70 px-2 font-mono text-[10px] tracking-[0.16em] text-[#14110c]/75 transition-colors hover:bg-[#14110c] hover:text-white md:px-2.5 md:text-[11px]"
             >
-              ← <span className="hidden sm:inline">返回总览</span>
+              <svg
+                className="h-3.5 w-3.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.8}
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <rect x="4" y="4" width="7" height="7" />
+                <rect x="13" y="4" width="7" height="7" />
+                <rect x="4" y="13" width="7" height="7" />
+                <rect x="13" y="13" width="7" height="7" />
+              </svg>
+              <span className="hidden sm:inline">返回总览</span>
             </Link>
           </>
         }

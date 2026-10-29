@@ -403,7 +403,7 @@ export default function PageContent({ data, defaultMode, hideModeSwitch }: PageC
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#f8fafc]">
       {/* ============ Hero banner - P0 统一：280px + 装饰线 + 主色眉头 + 分阶入场 ============ */}
-      <section className="relative h-[280px] overflow-hidden">
+      <section className="relative h-[168px] overflow-hidden md:h-[250px]">
         <div className="absolute inset-0">
           <img
             src={BANNER.background || "/images/banner-news.webp"}
@@ -448,64 +448,66 @@ export default function PageContent({ data, defaultMode, hideModeSwitch }: PageC
         </div>
       </section>
 
-      {/* ============ 顶部标签行（原「首页 › 新闻动态」面包屑，独立站里已无层级可指，改为栏目化小标） ============ */}
-      <div className="max-w-6xl mx-auto px-4 md:px-8">
-        <div className="border-b border-[#e2e8f0] py-3 mt-4 md:mt-6">
-          <div className="flex items-center gap-2 font-mono text-[11px] tracking-[0.22em] text-[#64748b]">
-            <span className="text-[#0f172a]">{SIDEBAR_TITLE}</span>
-            <span className="text-[#cbd5e1]">/</span>
-            <span>总览</span>
-          </div>
-        </div>
-      </div>
+      {/* 面包屑已删：banner 里已经写了标题，这里纯占地方 */}
 
       {/* ============ P2 无框文字 Tab：Bloomberg/FT 风格（彻底抛弃 chip 框） ============ */}
       <div className="max-w-6xl mx-auto px-4 md:px-8 mt-8 md:mt-12">
-        {/* 顶部信息条：编号眉头 + 横向规则线 + 共 X 篇 + 清除筛选（固定位置） */}
-        <div className="mb-6 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 sm:mb-10">
-          <div className="hidden flex-1 min-w-0 items-baseline gap-4 md:gap-6 sm:flex">
-            <span className="text-sm font-mono tracking-[0.3em] text-[#94a3b8] flex-shrink-0">
-              {String(tabs.length).padStart(2, "0")} / {String(tabs.length).padStart(2, "0")}
-            </span>
-            <span className="text-sm font-mono tracking-[0.3em] text-[#2563eb] font-bold flex-shrink-0">
-              NEWSROOM
-            </span>
-            <span className="flex-1 h-px bg-[#e2e8f0] min-w-[24px]" />
+        {/* 工具条第一行：搜索 + 计数 + 清除（原来「NEWSROOM / ITEMS」三行文字压成一行） */}
+        <div className="flex items-center gap-3 border-b border-[#e2e8f0] pb-2">
+          <div className="relative min-w-0 flex-1">
+            <svg className="absolute left-0 top-1/2 w-4 h-4 -translate-y-1/2 text-[#94a3b8] pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              placeholder="搜索文章…"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-6 pr-6 py-1.5 bg-transparent border-b border-transparent text-[15px] text-[#0f172a] placeholder-[#94a3b8] focus:outline-none focus:border-[#0f172a] transition-all duration-200"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-0 top-1/2 w-5 h-5 -translate-y-1/2 flex items-center justify-center text-[#94a3b8] hover:text-[#2563eb] transition-colors"
+                title="清除搜索"
+              >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
           </div>
-          <div className="flex items-baseline gap-4 flex-shrink-0">
-            <span className="text-sm font-mono text-[#94a3b8] tracking-wider">
-              <span className="text-[#0f172a] font-bold text-base">{String(filteredArticles.length).padStart(2, "0")}</span>
-              {" / "}
-              {String(newsItems.reduce((s, n) => s + n.articles.length, 0)).padStart(2, "0")} ITEMS
-            </span>
-            <button
-              onClick={() => {
-                setActiveSlug("all");
-                setSelectedMonth(0);
-                setSelectedYear(0);
-                setSearchQuery("");
-                setSortOrder("newest");
-              }}
-              disabled={activeSlug === "all" && selectedYear === 0 && selectedMonth === 0 && !searchQuery}
-              className={`text-sm font-medium transition-all ${
-                activeSlug === "all" && selectedYear === 0 && selectedMonth === 0 && !searchQuery
-                  ? "text-[#cbd5e1] cursor-not-allowed"
-                  : "text-[#2563eb] hover:underline"
-              }`}
-            >
-              清除筛选 ×
-            </button>
-          </div>
+          <span className="shrink-0 whitespace-nowrap font-mono text-[11px] tracking-wider text-[#94a3b8]">
+            <span className="font-bold text-[#0f172a]">{String(filteredArticles.length).padStart(2, "0")}</span>
+            /{String(newsItems.reduce((s, n) => s + n.articles.length, 0)).padStart(2, "0")}
+          </span>
+          <button
+            onClick={() => {
+              setActiveSlug("all");
+              setSelectedMonth(0);
+              setSelectedYear(0);
+              setSearchQuery("");
+              setSortOrder("newest");
+            }}
+            disabled={activeSlug === "all" && selectedYear === 0 && selectedMonth === 0 && !searchQuery}
+            className={`shrink-0 whitespace-nowrap text-[12px] font-medium transition-all ${
+              activeSlug === "all" && selectedYear === 0 && selectedMonth === 0 && !searchQuery
+                ? "text-[#cbd5e1] cursor-not-allowed"
+                : "text-[#2563eb] hover:underline"
+            }`}
+          >
+            清除 ×
+          </button>
         </div>
 
-        {/* 第一行：模式切换无框文字 + 分类无框文字 Tab + 搜索（同行） */}
-        <div className="flex flex-col lg:flex-row lg:items-center gap-5 lg:gap-6 mb-2">
+        {/* 第一行：分类无框文字 Tab（搜索已上移，不再单独占一行） */}
+        <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 mb-1">
           {/* 模式切换 - 无框文字 + 底线（紧凑型，无背景容器）；首页封面模式下隐藏 */}
           {!hideModeSwitch && (
           <div className="flex items-center gap-5 lg:gap-6 flex-shrink-0 border-b border-transparent">
             <button
               onClick={() => setMode("hotspot")}
-              className={`relative pb-2 text-base tracking-wide transition-colors ${
+              className={`relative pb-2 text-[15px] tracking-wide transition-colors ${
                 mode === "hotspot"
                   ? "text-[#0f172a] font-bold"
                   : "text-[#475569] font-medium hover:text-[#0f172a]"
@@ -522,7 +524,7 @@ export default function PageContent({ data, defaultMode, hideModeSwitch }: PageC
             </button>
             <button
               onClick={() => setMode("overview")}
-              className={`relative pb-2 text-base tracking-wide transition-colors ${
+              className={`relative pb-2 text-[15px] tracking-wide transition-colors ${
                 mode === "overview"
                   ? "text-[#0f172a] font-bold"
                   : "text-[#475569] font-medium hover:text-[#0f172a]"
@@ -549,7 +551,7 @@ export default function PageContent({ data, defaultMode, hideModeSwitch }: PageC
                   <button
                     key={tab.slug}
                     onClick={() => handleTabSwitch(tab.slug)}
-                    className={`relative pb-2 text-base tracking-wide transition-colors ${
+                    className={`relative pb-2 text-[15px] tracking-wide transition-colors ${
                       isActive
                         ? "text-[#0f172a] font-bold"
                         : "text-[#475569] font-medium hover:text-[#0f172a]"
@@ -570,42 +572,15 @@ export default function PageContent({ data, defaultMode, hideModeSwitch }: PageC
             </nav>
           )}
 
-          {/* 搜索框 - 下划线式（极简） */}
-          <div className="relative w-full lg:w-56 flex-shrink-0 lg:ml-auto">
-            <svg className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8] pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input
-              type="text"
-              placeholder="搜索文章..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-6 pr-3 py-2 bg-transparent border-b border-[#e2e8f0] text-base text-[#0f172a] placeholder-[#94a3b8] focus:outline-none focus:border-[#0f172a] transition-all duration-200"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="absolute right-0 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-[#94a3b8] hover:text-[#2563eb] transition-colors"
-                title="清除搜索"
-              >
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            )}
-          </div>
+          {/* 搜索框已上移到工具条第一行 */}
         </div>
 
-        {/* 第二行：年份 + 月份 + 排序（无框文字 + 底线） */}
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 py-7 border-t border-[#e2e8f0]">
-          <span className="text-xs font-mono tracking-[0.25em] text-[#94a3b8] flex-shrink-0">
-            FILTER ·
-          </span>
-
+        {/* 第二行：年份 + 月份 + 排序（去掉 FILTER 标签，压成一行） */}
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 py-2 border-t border-[#e2e8f0]">
           {/* 年份无框文字 + 底线 */}
           <button
             onClick={() => setSelectedYear(0)}
-            className={`relative pb-1.5 text-sm tracking-wide transition-colors ${
+            className={`relative pb-1 text-[13px] tracking-wide transition-colors ${
               selectedYear === 0
                 ? "text-[#0f172a] font-bold"
                 : "text-[#475569] font-medium hover:text-[#0f172a]"
@@ -624,7 +599,7 @@ export default function PageContent({ data, defaultMode, hideModeSwitch }: PageC
             <button
               key={y}
               onClick={() => setSelectedYear(y)}
-              className={`relative pb-1.5 text-sm tracking-wide transition-colors ${
+              className={`relative pb-1 text-[13px] tracking-wide transition-colors ${
                 selectedYear === y
                   ? "text-[#0f172a] font-bold"
                   : "text-[#475569] font-medium hover:text-[#0f172a]"
@@ -641,14 +616,14 @@ export default function PageContent({ data, defaultMode, hideModeSwitch }: PageC
             </button>
           ))}
 
-          <span className="text-[#cbd5e1] text-sm">|</span>
+          <span className="text-[#e2e8f0] text-[13px]">|</span>
 
           {/* 月份 - 原生 select 下划线式 */}
           <div className="relative">
             <select
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(parseInt(e.target.value, 10))}
-              className="appearance-none bg-transparent pr-5 pb-1.5 text-sm text-[#475569] hover:text-[#0f172a] border-b border-[#e2e8f0] focus:outline-none focus:border-[#0f172a] cursor-pointer transition-all font-medium"
+              className="appearance-none bg-transparent pr-5 pb-1 text-[13px] text-[#475569] hover:text-[#0f172a] border-b border-[#e2e8f0] focus:outline-none focus:border-[#0f172a] cursor-pointer transition-all font-medium"
             >
               <option value={0}>全部月份</option>
               {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
@@ -660,12 +635,12 @@ export default function PageContent({ data, defaultMode, hideModeSwitch }: PageC
             </svg>
           </div>
 
-          <span className="text-[#cbd5e1] text-sm">|</span>
+          <span className="text-[#e2e8f0] text-[13px]">|</span>
 
           {/* 排序无框文字 + 底线 */}
           <button
             onClick={() => setSortOrder("newest")}
-            className={`relative pb-1.5 text-sm tracking-wide transition-colors ${
+            className={`relative pb-1 text-[13px] tracking-wide transition-colors ${
               sortOrder === "newest"
                 ? "text-[#0f172a] font-bold"
                 : "text-[#475569] font-medium hover:text-[#0f172a]"
@@ -682,7 +657,7 @@ export default function PageContent({ data, defaultMode, hideModeSwitch }: PageC
           </button>
           <button
             onClick={() => setSortOrder("oldest")}
-            className={`relative pb-1.5 text-sm tracking-wide transition-colors ${
+            className={`relative pb-1 text-[13px] tracking-wide transition-colors ${
               sortOrder === "oldest"
                 ? "text-[#0f172a] font-bold"
                 : "text-[#475569] font-medium hover:text-[#0f172a]"

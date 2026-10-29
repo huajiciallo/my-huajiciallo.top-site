@@ -70,9 +70,22 @@ export default function HomeShell({
           actions={
             <button
               onClick={() => switchTo("index")}
-              className="group inline-flex h-8 items-center gap-1.5 border border-[#14110c]/25 bg-white/70 px-2 font-mono text-[10px] tracking-[0.14em] whitespace-nowrap text-[#14110c]/75 transition-colors hover:bg-[#14110c] hover:text-white sm:px-3 sm:text-[11px] sm:tracking-[0.18em]"
+              aria-label="返回首页"
+              title="返回首页"
+              className="group inline-flex h-8 items-center gap-1.5 whitespace-nowrap border border-[#14110c]/25 bg-white/70 px-2 font-mono text-[10px] tracking-[0.14em] text-[#14110c]/75 transition-colors hover:bg-[#14110c] hover:text-white sm:px-3 sm:text-[11px] sm:tracking-[0.18em]"
             >
-              <span className="transition-transform group-hover:-translate-x-0.5">←</span>
+              <svg
+                className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.8}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4v-5H9v5H5a1 1 0 0 1-1-1v-8.5Z" />
+              </svg>
               <span className="hidden sm:inline">返回首页</span>
             </button>
           }
