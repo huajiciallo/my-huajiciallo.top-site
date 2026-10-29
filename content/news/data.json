@@ -23,34 +23,34 @@
           "id": "gallery-aru-01",
           "pinned": true,
           "layout": "gallery",
-          "prompt": "Blue Archive; Aru，horizontal composition, cinematic three-layer spatial depth, large depth of field with sharp focus on the character in the foreground. Foreground: the girl is large in the frame, directly facing the camera with eye contact, on the left side of the foreground, looking directly at the viewer,one hand making a cat-ear gesture above her head, the other hand relaxed, playful smile, wearing a summer office-lady outfit,. Soft warm sunset light illuminates her face, creating delicate light-and-shadow effects and a cinematic atmosphere. Midground: a continuous dirt road extending from the bottom of the frame toward the distance, connecting to the field scenery. Background: a blurred modern city skyline with bokeh, the road continues into the distance. High-detail anime art style, oil-painting texture, soft warm color palette, cinematic lighting, 2K resolution",
-          "negative": "low quality, blurry, deformed, text, signature, watermark, multiple limbs, extra fingers, ugly,lowres,bad anatomy,bad hands,text,error,missing fingers,extra digit,fewer digits,cropped,worst quality,low quality,normal quality,jpeg artifacts, signature,watermark, username,blurry,bad feet,deformed,text,signature,multiple limbs,extra fingers,ugly,censored,jpeg artifacts,patreon logo,patreon username,web address,signature,logo,artist name,safe neg,(extra fingers:2.0),extra fingers，extra toes，(extra toes:2.0)，lamp，eyes_visible_through_hair，close-up, face shot, headshot, bust shot, cropped, out of frame, top cut off, side cut off, arm cut off, head cut off, zoomed in, extremely tight framing",
-          "notes": [
-            "1. 原文：Blue Archive; Aru\n翻译：碧蓝档案；陆八魔亚瑠（阿露）\n说明：生效。画中角色是碧蓝档案的陆八魔亚瑠，粉色长发、单侧牛角配饰、红色光环这些角色特征都正确，画风也贴合碧蓝档案的美术风格。",
-            "2. 原文：horizontal composition\n翻译：横向构图\n说明：生效。画面是宽幅横向比例，属于横版构图。",
-            "3. 原文：cinematic three-layer spatial depth, large depth of field with sharp focus on the character in the foreground.\n翻译：电影感三层空间纵深，大景深，焦点清晰落在前景人物身上\n说明：部分生效。前景人物、中景田野土路、背景城市，三层空间层次和纵深感做出来了，人物对焦清晰；但背景城市是虚化的浅景深效果，没有实现大景深。",
-            "4. 原文：Foreground: the girl is large in the frame, directly facing the camera with eye contact, on the left side of the foreground, looking directly at the viewer\n翻译：前景：少女在画面中占比较大，正对镜头，和观者对视，处在前景左侧，直视观看者\n说明：部分生效。人物在画面左侧、占比大、视线朝向观看者；但人物不是完全正对镜头，是偏侧的角度，没有严格正对相机。",
-            "5. 原文：one hand making a cat-ear gesture above her head, the other hand relaxed, playful smile\n翻译：一只手在头顶比猫耳手势，另一只手自然放松，俏皮的笑容\n说明：部分生效。人物是开朗俏皮的笑容，情绪符合描述；两只手都没有做猫耳手势，一只手臂伸出画面外，另一只在脸旁张开手掌，手部姿态不满足要求。",
-            "6. 原文：wearing a summer office-lady outfit.\n翻译：穿着夏季 OL 通勤套装\n说明：部分生效。角色是翻领衬衫配领绳，有制服通勤感；只露出上半身，缺少夏季 OL 套装的完整特征，和典型夏季职场套装匹配度不高。",
-            "7. 原文：Soft warm sunset light illuminates her face, creating delicate light-and-shadow effects and a cinematic atmosphere.\n翻译：柔和温暖的日落光线打亮她的面部，营造细腻光影与电影氛围\n说明：生效。整体是黄昏暖调光线，面部光影过渡柔和，黄昏氛围感和电影感充足。",
-            "8. 原文：Midground: a continuous dirt road extending from the bottom of the frame toward the distance, connecting to the field scenery.\n翻译：中景：一条连贯土路从画面底部向远方延伸，衔接田野景色\n说明：生效。土路从画面底部一直伸向远处，道路两侧是连片田野，结构和场景完全匹配。",
-            "9. 原文：Background: a blurred modern city skyline with bokeh, the road continues into the distance.\n翻译：背景：虚化的现代城市天际线，带有散景效果，道路一直延伸向远方城市\n说明：生效。远处城市建筑是朦胧虚化的散景效果，土路向着城市方向纵深延伸。",
-            "10. 原文：High-detail anime art style, oil-painting texture, soft warm color palette, cinematic lighting, 2K resolution\n翻译：高细节动漫画风，油画肌理质感，柔和暖色调，电影打光，2K 分辨率\n说明：部分生效。精细二次元画风、暖色调、电影感打光、高清画质都满足；画面是常规二次元数字渲染，不存在油画笔触和肌理质感。"
-          ],
-          "negativeNotes": [
-            "1. 原文：low quality, blurry, lowres, worst quality, jpeg artifacts\n翻译：低画质、模糊、低分辨率、最差画质、jpg 压缩伪影\n说明：生效。画面清晰干净，没有模糊、低清、压缩噪点这类画质缺陷。",
-            "2. 原文：deformed, bad anatomy, bad hands, multiple limbs, extra fingers, extra toes, missing fingers, fewer digits\n翻译：畸形、人体结构崩坏、手部崩坏、多出肢体、多指、多趾、缺指、手指数量异常\n说明：生效。人物人体结构正常，可见的手部形态正常，没有肢体、手指畸形崩坏问题。",
-            "3. 原文：text, signature, watermark, logo, artist name, web address, username, patreon logo\n翻译：文字、签名、水印、标识、作者名字、网址、用户名、平台 logo\n说明：生效。整张画面没有任何文字、水印、签名、标识类元素。",
-            "4. 原文：close-up, headshot, bust shot, cropped, out of frame, arm cut off, head cut off, zoomed in, extremely tight framing\n翻译：特写、大头照、胸像、裁切、物体跑出画面、手臂被截断、头部被截断、放大特写、极紧凑构图\n说明：部分生效。不属于脸部大头特写、胸像和过度紧凑的放大构图；画面左侧手臂伸出画面被截断，画面下方裁切了人物身体，触发了禁止裁切的限制。",
-            "5. 原文：ugly, censored, lamp, eyes_visible_through_hair\n翻译：丑陋、打码遮挡、灯具、头发穿模露出眼睛\n说明：生效。人物形象正常，没有遮挡打码，没有多余灯具，不存在头发穿模漏眼的问题。"
-          ],
           "images": [
             {
               "url": "/images/bg/left/l-01.webp",
-              "caption": ""
+              "prompt": "Blue Archive; Aru，horizontal composition, cinematic three-layer spatial depth, large depth of field with sharp focus on the character in the foreground. Foreground: the girl is large in the frame, directly facing the camera with eye contact, on the left side of the foreground, looking directly at the viewer,one hand making a cat-ear gesture above her head, the other hand relaxed, playful smile, wearing a summer office-lady outfit,. Soft warm sunset light illuminates her face, creating delicate light-and-shadow effects and a cinematic atmosphere. Midground: a continuous dirt road extending from the bottom of the frame toward the distance, connecting to the field scenery. Background: a blurred modern city skyline with bokeh, the road continues into the distance. High-detail anime art style, oil-painting texture, soft warm color palette, cinematic lighting, 2K resolution",
+              "negative": "low quality, blurry, deformed, text, signature, watermark, multiple limbs, extra fingers, ugly,lowres,bad anatomy,bad hands,text,error,missing fingers,extra digit,fewer digits,cropped,worst quality,low quality,normal quality,jpeg artifacts, signature,watermark, username,blurry,bad feet,deformed,text,signature,multiple limbs,extra fingers,ugly,censored,jpeg artifacts,patreon logo,patreon username,web address,signature,logo,artist name,safe neg,(extra fingers:2.0),extra fingers，extra toes，(extra toes:2.0)，lamp，eyes_visible_through_hair，close-up, face shot, headshot, bust shot, cropped, out of frame, top cut off, side cut off, arm cut off, head cut off, zoomed in, extremely tight framing",
+              "notes": [
+                "1. 原文：Blue Archive; Aru\n翻译：碧蓝档案；陆八魔亚瑠（阿露）\n说明：生效。画中角色是碧蓝档案的陆八魔亚瑠，粉色长发、单侧牛角配饰、红色光环这些角色特征都正确，画风也贴合碧蓝档案的美术风格。",
+                "2. 原文：horizontal composition\n翻译：横向构图\n说明：生效。画面是宽幅横向比例，属于横版构图。",
+                "3. 原文：cinematic three-layer spatial depth, large depth of field with sharp focus on the character in the foreground.\n翻译：电影感三层空间纵深，大景深，焦点清晰落在前景人物身上\n说明：部分生效。前景人物、中景田野土路、背景城市，三层空间层次和纵深感做出来了，人物对焦清晰；但背景城市是虚化的浅景深效果，没有实现大景深。",
+                "4. 原文：Foreground: the girl is large in the frame, directly facing the camera with eye contact, on the left side of the foreground, looking directly at the viewer\n翻译：前景：少女在画面中占比较大，正对镜头，和观者对视，处在前景左侧，直视观看者\n说明：部分生效。人物在画面左侧、占比大、视线朝向观看者；但人物不是完全正对镜头，是偏侧的角度，没有严格正对相机。",
+                "5. 原文：one hand making a cat-ear gesture above her head, the other hand relaxed, playful smile\n翻译：一只手在头顶比猫耳手势，另一只手自然放松，俏皮的笑容\n说明：部分生效。人物是开朗俏皮的笑容，情绪符合描述；两只手都没有做猫耳手势，一只手臂伸出画面外，另一只在脸旁张开手掌，手部姿态不满足要求。",
+                "6. 原文：wearing a summer office-lady outfit.\n翻译：穿着夏季 OL 通勤套装\n说明：部分生效。角色是翻领衬衫配领绳，有制服通勤感；只露出上半身，缺少夏季 OL 套装的完整特征，和典型夏季职场套装匹配度不高。",
+                "7. 原文：Soft warm sunset light illuminates her face, creating delicate light-and-shadow effects and a cinematic atmosphere.\n翻译：柔和温暖的日落光线打亮她的面部，营造细腻光影与电影氛围\n说明：生效。整体是黄昏暖调光线，面部光影过渡柔和，黄昏氛围感和电影感充足。",
+                "8. 原文：Midground: a continuous dirt road extending from the bottom of the frame toward the distance, connecting to the field scenery.\n翻译：中景：一条连贯土路从画面底部向远方延伸，衔接田野景色\n说明：生效。土路从画面底部一直伸向远处，道路两侧是连片田野，结构和场景完全匹配。",
+                "9. 原文：Background: a blurred modern city skyline with bokeh, the road continues into the distance.\n翻译：背景：虚化的现代城市天际线，带有散景效果，道路一直延伸向远方城市\n说明：生效。远处城市建筑是朦胧虚化的散景效果，土路向着城市方向纵深延伸。",
+                "10. 原文：High-detail anime art style, oil-painting texture, soft warm color palette, cinematic lighting, 2K resolution\n翻译：高细节动漫画风，油画肌理质感，柔和暖色调，电影打光，2K 分辨率\n说明：部分生效。精细二次元画风、暖色调、电影感打光、高清画质都满足；画面是常规二次元数字渲染，不存在油画笔触和肌理质感。"
+              ],
+              "negativeNotes": [
+                "1. 原文：low quality, blurry, lowres, worst quality, jpeg artifacts\n翻译：低画质、模糊、低分辨率、最差画质、jpg 压缩伪影\n说明：生效。画面清晰干净，没有模糊、低清、压缩噪点这类画质缺陷。",
+                "2. 原文：deformed, bad anatomy, bad hands, multiple limbs, extra fingers, extra toes, missing fingers, fewer digits\n翻译：畸形、人体结构崩坏、手部崩坏、多出肢体、多指、多趾、缺指、手指数量异常\n说明：生效。人物人体结构正常，可见的手部形态正常，没有肢体、手指畸形崩坏问题。",
+                "3. 原文：text, signature, watermark, logo, artist name, web address, username, patreon logo\n翻译：文字、签名、水印、标识、作者名字、网址、用户名、平台 logo\n说明：生效。整张画面没有任何文字、水印、签名、标识类元素。",
+                "4. 原文：close-up, headshot, bust shot, cropped, out of frame, arm cut off, head cut off, zoomed in, extremely tight framing\n翻译：特写、大头照、胸像、裁切、物体跑出画面、手臂被截断、头部被截断、放大特写、极紧凑构图\n说明：部分生效。不属于脸部大头特写、胸像和过度紧凑的放大构图；画面左侧手臂伸出画面被截断，画面下方裁切了人物身体，触发了禁止裁切的限制。",
+                "5. 原文：ugly, censored, lamp, eyes_visible_through_hair\n翻译：丑陋、打码遮挡、灯具、头发穿模露出眼睛\n说明：生效。人物形象正常，没有遮挡打码，没有多余灯具，不存在头发穿模漏眼的问题。"
+              ]
             }
           ],
-          "content": []
+          "content": [],
+          "album": true
         },
         {
           "date": "2026-06-05",
@@ -59,14 +59,10 @@
           "tag": "新品发布",
           "title": "活动01",
           "summary": "活动记录 · 图集",
-          "image": "/images/yaliu-01.jpg",
+          "image": "/images/album/activity-01/a01-01.webp",
           "id": "article-006",
-          "images": [
-            {
-              "url": "/images/yaliu-01.jpg",
-              "caption": ""
-            }
-          ]
+          "images": [],
+          "album": true
         }
       ]
     },

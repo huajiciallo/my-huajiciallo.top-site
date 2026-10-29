@@ -6,3 +6,9 @@
 
 /images/*
   Cache-Control: public, max-age=604800
+
+# 音频：显式声明 Content-Type，避免个别浏览器把它当二进制下载
+# 换歌时改文件名（yaaliu-01…），所以这里可以长缓存
+/audio/*
+  Content-Type: audio/aac
+  Cache-Control: public, max-age=31536000

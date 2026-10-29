@@ -22,6 +22,36 @@
 
 import ArticleDetailInner from "./ArticleDetailInner";
 import data from "../../../../../content/news/data.json";
+import fs from "node:fs";
+import path from "node:path";
+
+/*
+ * 图集相册：构建时直接读文件夹里的图片，
+ * 新图丢进目录就会自动出现在该条目的序号切换条里（不用改代码）。
+ *
+ *   gallery-aru-01 → public/images/bg/left + bg/right（背景图全集）
+ *   article-006    → public/images/album/activity-01（活动01 自己的相册）
+ */
+const IMG_RE = /\.(webp|jpe?g|png|avif|gif)$/i;
+
+function listDir(...segments: string[]): string[] {
+  try {
+    const dir = path.join(process.cwd(), "public", "images", ...segments);
+    return fs
+      .readdirSync(dir)
+      .filter((f) => IMG_RE.test(f))
+      .sort((a, b) => a.localeCompare(b, "en"))
+      .map((f) => `/images/${segments.join("/")}/${f}`);
+  } catch {
+    return [];
+  }
+}
+
+/** 每个条目用自己的相册目录；没配的条目只有封面一张 */
+const ALBUMS: Record<string, string[]> = {
+  "gallery-aru-01": [...listDir("bg", "left"), ...listDir("bg", "right")],
+  "article-006": listDir("album", "activity-01"),
+};
 
 // ============ 静态生成所有 (category, slug) 组合 ============
 export function generateStaticParams() {
@@ -46,5 +76,11 @@ export default async function ArticleDetailPage({
   params: Promise<{ category: string; slug: string }>;
 }) {
   const { category, slug } = await params;
-  return <ArticleDetailInner category={category} slug={slug} />;
+  return (
+    <ArticleDetailInner
+      category={category}
+      slug={slug}
+      album={ALBUMS[slug] || []}
+    />
+  );
 }

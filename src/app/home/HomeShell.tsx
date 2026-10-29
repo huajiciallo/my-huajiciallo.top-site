@@ -16,6 +16,7 @@
 import { Suspense, useEffect, useState } from "react";
 import PageContent from "../news/PageContent";
 import CategoryBoard from "./CategoryBoard";
+import PageBar from "../components/PageBar";
 
 export default function HomeShell({
   data,
@@ -54,22 +55,28 @@ export default function HomeShell({
   if (view === "list") {
     return (
       <main>
-        <div className="bg-[#14110c] text-white">
-          <div className="mx-auto flex h-16 max-w-[1240px] items-center justify-between gap-6 px-6">
+        <PageBar
+          left={
+            <>
+              <span className="font-editorial text-[15px] font-bold tracking-[0.02em] text-[#14110c]/80 md:text-[17px]">
+                亚瑠啦啦队
+              </span>
+              <span className="hidden h-3 w-px bg-[#14110c]/20 sm:block" />
+              <span className="font-mono text-[11px] tracking-[0.2em] text-[#14110c]/45">
+                活动总览 · {String(total).padStart(2, "0")} 篇
+              </span>
+            </>
+          }
+          actions={
             <button
               onClick={() => switchTo("index")}
-              className="group inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.24em] text-white/70 transition-colors hover:text-white"
+              className="group inline-flex h-8 items-center gap-2 border border-[#14110c]/25 bg-white/70 px-3 font-mono text-[11px] tracking-[0.18em] text-[#14110c]/75 transition-colors hover:bg-[#14110c] hover:text-white"
             >
-              <span className="transition-transform group-hover:-translate-x-0.5">
-                ←
-              </span>
+              <span className="transition-transform group-hover:-translate-x-0.5">←</span>
               返回首页
             </button>
-            <span className="font-mono text-[11px] tracking-[0.24em] text-white/40">
-              总览 · {String(total).padStart(2, "0")} 篇
-            </span>
-          </div>
-        </div>
+          }
+        />
 
         <Suspense fallback={null}>
           <PageContent data={data} defaultMode="overview" hideModeSwitch />

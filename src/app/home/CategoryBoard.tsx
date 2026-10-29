@@ -27,6 +27,7 @@ import {
   saveStoredPins,
   type PinMap,
 } from "../../lib/pins";
+import AudioPill from "../components/AudioPill";
 
 const AUTO_MS = 8000; // 自动切换间隔
 const HOVER_DELAY_MS = 1000; // 留白处停留多久开始展开
@@ -286,17 +287,20 @@ export default function CategoryBoard({
         className="mx-auto flex min-h-screen max-w-[1280px] flex-col px-5 pb-6 pt-6 transition-opacity duration-[1200ms] ease-out md:px-8 md:pt-7"
         style={{ opacity: revealed ? 0 : 1 }}
       >
-        <header className="flex items-center justify-between gap-4 pb-3">
+        <header className="flex h-14 shrink-0 items-center justify-between gap-4">
           <h1 className="font-editorial text-[15px] font-bold tracking-[0.02em] text-[#14110c]/80 md:text-[17px]">
             亚瑠啦啦队
           </h1>
-          <button
-            onClick={onOpenList}
-            className="group inline-flex items-center gap-2 border border-[#14110c]/25 px-3.5 py-1.5 font-mono text-[11px] tracking-[0.18em] text-[#14110c]/75 transition-colors hover:border-[#14110c] hover:bg-[#14110c] hover:text-white"
-          >
-            总览
-            <span className="transition-transform group-hover:translate-x-0.5">→</span>
-          </button>
+          <div className="flex shrink-0 items-center gap-2">
+            <button
+              onClick={onOpenList}
+              className="group inline-flex items-center gap-2 border border-[#14110c]/25 px-3.5 py-1.5 font-mono text-[11px] tracking-[0.18em] text-[#14110c]/75 transition-colors hover:border-[#14110c] hover:bg-[#14110c] hover:text-white"
+            >
+              总览
+              <span className="transition-transform group-hover:translate-x-0.5">→</span>
+            </button>
+            <AudioPill />
+          </div>
         </header>
 
         <div className="grid min-h-0 flex-1 gap-3 lg:grid-cols-3 lg:grid-rows-2 lg:gap-4">

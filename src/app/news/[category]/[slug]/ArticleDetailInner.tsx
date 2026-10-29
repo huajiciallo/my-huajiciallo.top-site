@@ -13,6 +13,7 @@ import Link from "next/link";
 import data from "../../../../../content/news/data.json";
 import { parseArticleContent } from "../../../../lib/parseArticleContent";
 import GalleryDetail from "./GalleryDetail";
+import ViewCount from "../../../components/ViewCount";
 
 const CATEGORY_NAMES: Record<string, string> = {
   industry: "图集",
@@ -87,9 +88,11 @@ const PLACEHOLDER_ARTICLE = {
 interface InnerProps {
   category: string;
   slug: string;
+  /** 图集相册：构建时从 public/images/bg 读出来的全部图片 */
+  album?: string[];
 }
 
-export default function ArticleDetailInner({ category, slug }: InnerProps) {
+export default function ArticleDetailInner({ category, slug, album = [] }: InnerProps) {
   const router = useRouter();
 
   const { article: realArticle, prev, next, related } = findArticleWithNav(category, slug);
@@ -125,7 +128,14 @@ export default function ArticleDetailInner({ category, slug }: InnerProps) {
 
   // 图集（industry）：左图 + 右侧提示词，单独一套版式
   if (category === "industry") {
-    return <GalleryDetail article={article} categoryName={categoryName} />;
+    return (
+      <GalleryDetail
+        article={article}
+        categoryName={categoryName}
+        category={category}
+        album={album}
+      />
+    );
   }
 
   return (
@@ -282,8 +292,13 @@ export default function ArticleDetailInner({ category, slug }: InnerProps) {
         </div>
 
         {/* 来源 */}
-        <div className="mt-10 pt-6 border-t border-[#e2e8f0] text-sm text-[#94a3b8]">
+        <div className="mt-10 pt-6 border-t border-[#e2e8f0] text-sm text-[#94a3b8] flex flex-wrap items-center gap-3">
           <span>来源：{(article as any).source || "亚瑠啦啦队"}</span>
+          <span className="text-[#cbd5e1]">·</span>
+          <ViewCount
+            slug={`${category}/${article.id}`}
+            className="text-[#94a3b8]"
+          />
         </div>
 
         {/* 返回按钮 */}

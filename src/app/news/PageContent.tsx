@@ -34,6 +34,7 @@ import {
   pushRemotePins,
   type PinMap,
 } from "../../lib/pins";
+import { fetchViews } from "../../lib/views";
 
 // ---------- 类型定义 ----------
 interface Article {
@@ -140,6 +141,12 @@ export default function PageContent({ data, defaultMode, hideModeSwitch }: PageC
   const [pins, setPins] = useState<PinMap>(() =>
     defaultPinMap(newsItems as any)
   );
+
+  // 访问量：来自 /api/views（Cloudflare KV）。拿不到就不显示，不报错
+  const [views, setViews] = useState<Record<string, number> | null>(null);
+  useEffect(() => {
+    fetchViews().then((v) => setViews(v));
+  }, []);
   useEffect(() => {
     setPins((base) => mergePins(base, readStoredPins(), newsItems as any));
     fetchRemotePins().then((remote) => {
@@ -891,6 +898,19 @@ export default function PageContent({ data, defaultMode, hideModeSwitch }: PageC
                               ★ 置顶
                             </span>
                           )}
+                          {views &&
+                            (views[`${article.categorySlug}/${article.id}`] ||
+                              0) > 0 && (
+                              <>
+                                <span className="text-[#cbd5e1]">·</span>
+                                <span className="text-[#94a3b8]">
+                                  {views[
+                                    `${article.categorySlug}/${article.id}`
+                                  ].toLocaleString("zh-CN")}{" "}
+                                  次浏览
+                                </span>
+                              </>
+                            )}
                         </div>
                       </div>
                     </Link>
